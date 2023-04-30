@@ -65,7 +65,7 @@
     <main class="content on">
       <section class="outer">
   <article
-  id="post-linux"
+  id="post-线程"
   class="article article-type-post"
   itemscope
   itemprop="blogPost"
@@ -84,7 +84,7 @@
     </header>
      
     <div class="article-meta">
-      <a href="/2023/04/26/linux/" class="article-date">
+      <a href="/2023/04/26/%E7%BA%BF%E7%A8%8B/" class="article-date">
   <time datetime="2023-04-25T16:00:00.000Z" itemprop="datePublished">2023-04-26</time>
 </a> 
   <div class="article-category">
@@ -96,7 +96,7 @@
         <span class="post-meta-item-icon">
             <i class="ri-quill-pen-line"></i>
             <span class="post-meta-item-text"> Word count:</span>
-            <span class="post-count">5.3k</span>
+            <span class="post-count">5.8k</span>
         </span>
     </span>
 
@@ -105,7 +105,7 @@
         <span class="post-meta-item-icon">
             <i class="ri-book-open-line"></i>
             <span class="post-meta-item-text"> Reading time≈</span>
-            <span class="post-count">22 min</span>
+            <span class="post-count">23 min</span>
         </span>
     </span>
 </div>
@@ -126,6 +126,8 @@
 <li><p><strong>线程是操作系统任务调度的基本单位</strong></p>
 </li>
 <li><p><strong>Linux内核中的线程可以看作是轻量级进程</strong></p>
+</li>
+<li><p><strong>进程具有独立性，线程不具有独立性</strong></p>
 <p>我们知道，Linux内核在创建<strong>进程</strong>时：</p>
 <ol>
 <li>创建并初始化<strong>进程控制块 PCB（Process Control Block）</strong>：它记录了进程的状态、标识符、优先级等。</li>
@@ -137,10 +139,17 @@
 </ol>
 <p>而Linux内核在创建<strong>线程</strong>时：</p>
 <p>  1.初始化线程控制块（Thread Control Block，TCB）</p>
-<p>  2.设置线程的堆栈</p>
+<p>  2.设置线程的堆栈、寄存器</p>
 <p>  3.设置线程的调度属性</p>
 <p>  4.加入到进程的线程组中，这些线程共享进程的部分资源</p>
-<p>这些创建出来的线程<strong>共享进程的地址空间和其他资源</strong>（文件描述符，信号处理器等），其创建的开销远小于进程，所以我们说Linux下线程可以看作是轻量级进程。</p>
+<p>这些创建出来的线程不创建地址空间，而是<strong>共享进程的地址空间和其他资源</strong>（文件描述符，信号处理器等），其创建的开销远小于进程，所以我们说Linux下线程可以看作是轻量级进程。</p>
+<p>进程拥有自己独立的进程地址空间，进程具有独立性，而线程共享进程的地址空间，所有线程不具有独立性。线程除了共享进程地址空间，也拥有自己的私有成员：线程标识符、线程栈、线程寄存器</p>
+<p><strong>线程栈和线程寄存器是线程的两个重要组成部分：</strong></p>
+<ul>
+<li>线程栈是一个特殊的内存区域，用于存储线程执行时的函数调用栈、局部变量、函数参数等数据。每个线程都有自己的线程栈，线程栈的大小在创建线程时可以指定。线程在执行过程中，会不断地向线程栈中压入和弹出函数调用的相关信息，从而实现程序的正常执行。</li>
+<li>线程寄存器是CPU中的一组特殊寄存器，用于存储线程执行时的上下文信息，包括程序计数器、栈指针、通用寄存器等。线程在执行过程中，需要不断地保存和恢复这些寄存器的值，以便在线程切换时保持线程的执行状态。</li>
+</ul>
+<p>在Linux系统中，线程栈和线程寄存器是由内核进行管理和调度的。线程栈和线程寄存器的分配和初始化工作是由内核在创建线程时完成的，当线程被切换时，内核会将线程栈和线程寄存器中的内容保存下来，然后切换到其他线程的执行上下文。因此，线程栈和线程寄存器的正确使用和管理对于线程的正常运行至关重要。</p>
 </li>
 </ul>
 <h4 id="1-2-Linux下线程的种类"><a href="#1-2-Linux下线程的种类" class="headerlink" title="1.2  Linux下线程的种类"></a>1.2  Linux下线程的种类</h4><ol>
@@ -443,7 +452,7 @@
     <a class="modal-close" href="javascript:;"><i class="ri-close-circle-line"></i></a>
     <p>扫一扫，分享到微信</p>
     <div class="wx-qrcode">
-      <img src="//api.qrserver.com/v1/create-qr-code/?size=150x150&data=http://example.com/2023/04/26/linux/" alt="微信分享二维码">
+      <img src="//api.qrserver.com/v1/create-qr-code/?size=150x150&data=http://example.com/2023/04/26/%E7%BA%BF%E7%A8%8B/" alt="微信分享二维码">
     </div>
 </div>
 
@@ -452,6 +461,20 @@
   </div>
 
    
+  <nav class="article-nav">
+    
+      <a href="/2023/04/29/%E8%BF%9B%E7%A8%8B/" class="article-nav-link">
+        <strong class="article-nav-caption">上一篇</strong>
+        <div class="article-nav-title">
+          
+            Linux进程
+          
+        </div>
+      </a>
+    
+    
+  </nav>
+
   
    
   

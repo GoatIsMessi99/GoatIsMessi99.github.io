@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+
+
+<html lang="en">
+  
+
+    <head>
+      <meta charset="utf-8" />
+        
+      <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=1"
+      />
+      <title>Linux进程 |  嘉禾望岗</title>
+  <meta name="generator" content="hexo-theme-ayer">
+      
+      <link rel="shortcut icon" href="/favicon.ico" />
+       
+<link rel="stylesheet" href="/dist/main.css">
+
+      
+<link rel="stylesheet" href="/css/fonts/remixicon.css">
+
+      
+<link rel="stylesheet" href="/css/custom.css">
+ 
+      <script src="https://cdn.staticfile.org/pace/1.2.4/pace.min.js"></script>
+       
+ 
+
+      <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-bulma@5.0.1/bulma.min.css"
+      />
+      <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.19/dist/sweetalert2.min.js"></script>
+
+      <!-- mermaid -->
+      
+      <style>
+        .swal2-styled.swal2-confirm {
+          font-size: 1.6rem;
+        }
+      </style>
+    <link rel="alternate" href="/atom.xml" title="嘉禾望岗" type="application/atom+xml">
+</head>
+  </html>
+</html>
+
+
+<body>
+  <div id="app">
+    
+      <canvas class="fireworks"></canvas>
+      <style>
+        .fireworks {
+          position: fixed;
+          left: 0;
+          top: 0;
+          z-index: 99999;
+          pointer-events: none;
+        }
+      </style>
+      
+      
+    <main class="content on">
+      <section class="outer">
+  <article
+  id="post-进程"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h1 class="article-title sea-center" style="border-left:0" itemprop="name">
+  Linux进程
+</h1>
+ 
+
+      
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2023/04/29/%E8%BF%9B%E7%A8%8B/" class="article-date">
+  <time datetime="2023-04-28T16:00:00.000Z" itemprop="datePublished">2023-04-29</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Linux/">Linux</a>
+  </div>
+  
+<div class="word_count">
+    <span class="post-time">
+        <span class="post-meta-item-icon">
+            <i class="ri-quill-pen-line"></i>
+            <span class="post-meta-item-text"> Word count:</span>
+            <span class="post-count">3.2k</span>
+        </span>
+    </span>
+
+    <span class="post-time">
+        &nbsp; | &nbsp;
+        <span class="post-meta-item-icon">
+            <i class="ri-book-open-line"></i>
+            <span class="post-meta-item-text"> Reading time≈</span>
+            <span class="post-count">13 min</span>
+        </span>
+    </span>
+</div>
+ 
+    </div>
+      
+    <div class="tocbot"></div>
+
+
+
+
+  
+    <div class="article-entry" itemprop="articleBody">
+       
+  <h2 id="1-进程的概念"><a href="#1-进程的概念" class="headerlink" title="1. 进程的概念"></a>1. 进程的概念</h2><ul>
+<li>进程是操作系统对正在运行的程序实例的一种抽象</li>
+<li>进程是操作系统分配系统资源的基本单位</li>
+<li>每个进程之间是相对独立的</li>
+</ul>
+<p>计算机上运行着各种各样的程序，操作系统系统为了方便管理这些程序，将它们统一抽象成进程，这样就可以以统一的视角去管理这些程序，从而提高对系统资源的管理能力和利用率。</p>
+<p>当我们运行一个可执行程序时，操作系统会创建并初始化<strong>进程控制块 PCB（Process Control Block）</strong>，PCB里面就记录了可执行程序的各种属性：状态、标识符、优先级等等，通过这种方式，操作系统就将对可执行程序的管理转化成了对进程控制块的管理，如果使用各种数据结构将所有进程控制块管理起来，操作系统就完成了对计算机上所有可执行程序的管理。</p>
+<p>Linux下的进程控制块就是task_struct结构体，以下是一个简化版的task_struct:</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">task_struct</span> &#123;</span></span><br><span class="line">    <span class="type">pid_t</span> pid;                  <span class="comment">// 进程ID</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">thread_struct</span> *<span class="title">thread_info</span>;</span> <span class="comment">// 线程信息</span></span><br><span class="line">    <span class="type">void</span> *<span class="built_in">stack</span>;  <span class="comment">// 进程内核栈</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">task_struct</span> *<span class="title">parent</span>;</span> <span class="comment">// 父进程指针</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">list_head</span> <span class="title">children</span>;</span>  <span class="comment">// 子进程列表</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">list_head</span> <span class="title">siblings</span>;</span>  <span class="comment">// 兄弟进程列表</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">mm_struct</span> *<span class="title">mm</span>;</span>       <span class="comment">// 进程地址空间</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">file</span> *<span class="title">cwd</span>;</span>           <span class="comment">// 当前工作目录</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">files_struct</span> *<span class="title">files</span>;</span> <span class="comment">// 文件信息</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">signal_struct</span> *<span class="title">signal</span>;</span> <span class="comment">// 信号信息</span></span><br><span class="line">    <span class="type">int</span> exit_code;              <span class="comment">// 退出状态码</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>在创建进程控制块时，操作系统做了以下几个主要工作：</p>
+<ol>
+<li>初始化进程控制块task_struct：它记录了进程的状态、进程标识符、进程优先级等信息。</li>
+<li>分配进程地址空间：每个进程都有自己的虚拟地址空间，用于存放代码、数据和堆栈等信息。在创建进程时，内核会为该进程分配一个独立的虚拟地址空间，并将程序、数据和库文件等载入其中。</li>
+<li>复制父进程的内存空间：由于 Linux 使用了写时拷贝（Copy-on-Write，COW）技术，因此在创建进程时，内核会将父进程的内存空间复制一份，但是这些内存页并没有被实际复制，而是被标记为只读，当子进程需要修改其中的某个内存页时，内核会为其分配一个新的内存页，并将修改后的数据写入其中。</li>
+<li>复制父进程的文件描述符表：文件描述符表是进程用于管理文件和网络连接等资源的数据结构，在创建进程时，内核会将父进程的文件描述符表复制一份，并将其与子进程关联起来。</li>
+<li>设置进程的环境变量和命令行参数：每个进程都有自己的环境变量和命令行参数，这些信息用于指定进程的运行环境和参数。在创建进程时，内核会将父进程的环境变量和命令行参数复制一份，并将其与子进程关联起来。</li>
+<li>设置进程的信号处理器：信号是进程间通信的一种方式，在 Linux 中，每个进程都可以设置自己的信号处理器。在创建进程时，内核会将父进程的信号处理器复制一份，并将其与子进程关联起来。</li>
+</ol>
+<h2 id="2-进程控制"><a href="#2-进程控制" class="headerlink" title="2. 进程控制"></a>2. 进程控制</h2><p>在shell命令行中使用ps命令查看系统当前运行的进程：</p>
+<p><img src="http://lemon-pi.oss-cn-beijing.aliyuncs.com/img/2.1.png"></p>
+<ul>
+<li>PPID是父进程的进程ID</li>
+<li>PID是该进程的进程ID</li>
+<li>PGID是进程组的ID</li>
+<li>SID是当前会话的ID</li>
+<li>STAT是当前进程的状态</li>
+</ul>
+<p>其中，Linux下进程状态有以下几种：</p>
+<p><img src="http://lemon-pi.oss-cn-beijing.aliyuncs.com/img/2.2.png"></p>
+<p>其他状态字符：</p>
+<ul>
+<li>+   &#x2F;&#x2F;位于后台的进程组；</li>
+<li>s   &#x2F;&#x2F;进程组组长</li>
+<li>&lt;   &#x2F;&#x2F;优先级高的进程 </li>
+<li>N   &#x2F;&#x2F;优先级较低的进程 </li>
+<li>L   &#x2F;&#x2F;有些页被锁进内存； </li>
+<li>l   &#x2F;&#x2F;多线程，克隆线程（使用 CLONE_THREAD, 类似 NPTL pthreads）</li>
+</ul>
+<h4 id="2-1-fork"><a href="#2-1-fork" class="headerlink" title="2.1 fork"></a>2.1 fork</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">pid_t</span> <span class="title function_">fork</span><span class="params">(<span class="type">void</span>)</span>;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>DESCRIPTION<br>       fork()  creates a new process by duplicating the calling process. The new process, referred to as the child, is an exact duplicate of the calling process, referred to as the parent, except for the following points:</p>
+</blockquote>
+<p>调用fork会在当前进程中创建出新进程（称为子进程），继承父进程下列资源：</p>
+<ul>
+<li>父进程的代码段、数据段、堆栈段等代码和状态信息</li>
+<li>父进程打开的文件描述符</li>
+<li>父进程的环境变量、工作目录、umask</li>
+<li>父进程的信号处理方式</li>
+<li>将父进程的pid设为自己的ppid</li>
+</ul>
+<p>有以下区别：</p>
+<ul>
+<li>子进程拥有自己的进程pid、地址空间</li>
+<li>子进程的信号量、内存锁、资源利用率、CPU时间计数器全部重置</li>
+</ul>
+<blockquote>
+<p>RETURN VALUE<br>       On  success,  the  PID  of the child process is returned in the parent, and 0 is returned in the<br>       child.  On failure, -1 is returned in the parent, no child process is created, and errno is  set<br>       appropriately.</p>
+</blockquote>
+<p>如果fork创建成功，fork会在父进程中返回子进程的pid，在子进程中返回0，否则在父进程中返回-1。</p>
+<p>以下是一个简单的fork示例：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">cout</span>&lt;&lt;<span class="string">&quot;executed\n&quot;</span>;</span><br><span class="line">    <span class="type">pid_t</span> pid = fork();</span><br><span class="line">    <span class="keyword">if</span>(pid &lt; <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">std</span>::<span class="built_in">cerr</span>&lt;&lt;<span class="string">&quot;fork err\n&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span>(pid &gt; <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">std</span>::<span class="built_in">cout</span>&lt;&lt;<span class="string">&quot;pid: &quot;</span>&lt;&lt;getpid()&lt;&lt;<span class="string">&quot; parent\n&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span>(pid == <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">std</span>::<span class="built_in">cout</span>&lt;&lt;<span class="string">&quot;ppid: &quot;</span>&lt;&lt;getppid()&lt;&lt;<span class="string">&quot; pid: &quot;</span>&lt;&lt;getpid()&lt;&lt;<span class="string">&quot; child\n&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">cout</span>&lt;&lt;<span class="string">&quot;Not executed\n&quot;</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>执行结果：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[wyj@VM<span class="number">-20</span><span class="number">-8</span>-centos test]$ ./test</span><br><span class="line">executed</span><br><span class="line">pid: <span class="number">8051</span> parent</span><br><span class="line">Not executed</span><br><span class="line">ppid: <span class="number">8051</span> pid: <span class="number">8052</span> child</span><br><span class="line">Not executed</span><br></pre></td></tr></table></figure>
+
+<p>上述代码中，getpid()可以获取进程pid，getppid（）可以获取父进程pid.</p>
+<p>由结果可知，子进程继承了父进程代码段，子进程执行和父进程相同的代码段。</p>
+<p><strong>Question:子进程执行和父进程相同的代码段，为什么没有执行std::cout&lt;&lt;”executed\n” ?</strong></p>
+<p>原因：子进程继承了父进程的状态信息，其中就包括父进程PC指针寄存器的值，父进程fork时，PC指针指向pid_t pid &#x3D; fork()。因此子进程开始执行代码时，PC指针已经指向了pid_t pid &#x3D; fork() ，并从下一行代码开始执行，所以不会执行std::cout&lt;&lt;”executed\n”。</p>
+<h4 id="2-2-写时拷贝（Copy-on-Write，COW）"><a href="#2-2-写时拷贝（Copy-on-Write，COW）" class="headerlink" title="2.2  写时拷贝（Copy-on-Write，COW）"></a>2.2  写时拷贝（Copy-on-Write，COW）</h4><blockquote>
+<p>In Linux, when a process creates a new process (child process) through the fork() system call, the new process initially shares the same memory as the parent process. With COW, the operating system only creates a copy of the parent process’s memory pages when the child process modifies them.</p>
+</blockquote>
+<p>COW技术指fork子进程时，Linux系统内核会为子进程创建独立的地址空间，子进程的页表是父进程页表的一份拷贝，同时设置子进程页表中的写保护标志，此时子进程和父进程共享相同的物理内存。只有当子进程或者父进程需要修改这块共享物理内存上的值时，操作系统会捕获到写保护异常，此时才会开辟新的物理内存空间，填入修改后的值，并将子进程页表中对应的虚拟地址映射到新的物理内存空间上。</p>
+<p>这种设计可以避免不必要的物理内存空间拷贝，只有在实际需要修改物理内存时，才会发生数据的复制，从而节省了内存和时间。</p>
+<p>以下是一段父进程修改共享物理内存值时，发生写时拷贝的示例：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">int</span> x =<span class="number">0</span>;</span><br><span class="line">    <span class="type">pid_t</span> pid=fork();</span><br><span class="line">    <span class="keyword">if</span>(pid &gt; <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        x = <span class="number">10</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">cout</span>&lt;&lt;&amp;x&lt;&lt;<span class="string">&quot;:&quot;</span>&lt;&lt;x&lt;&lt;<span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>执行结果：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[wyj@VM<span class="number">-20</span><span class="number">-8</span>-centos test]$ g++ test.cc -o test -<span class="built_in">std</span>=c++<span class="number">11</span></span><br><span class="line">[wyj@VM<span class="number">-20</span><span class="number">-8</span>-centos test]$ ./test</span><br><span class="line"><span class="number">0x7ffdbb1f8618</span>:<span class="number">10</span></span><br><span class="line"><span class="number">0x7ffdbb1f8618</span>:<span class="number">0</span></span><br></pre></td></tr></table></figure>
+
+<p>由于子进程拷贝父进程的代码段、数据段、堆栈空间，所以X的虚拟地址相同，当父进程修改x变量的值时，发生了写时拷贝，在物理内存上开辟了新的空间存放子进程x变量的值，并将子进程页表中X的虚拟地址映射到新的物理内存中。而用户只能看到进程空间中的虚拟地址，看不到实际的物理内存地址，这也导致了我们看到了“相同的地址”，存放的值却不同的现象。</p>
+<p>刚创建子进程时，父子进程共享同一块物理内存：</p>
+<p><img src="http://lemon-pi.oss-cn-beijing.aliyuncs.com/img/3.1.png"></p>
+<p>父进程修改共享物理内存时：</p>
+<p><img src="http://lemon-pi.oss-cn-beijing.aliyuncs.com/img/3.2.png"></p>
+<h4 id="2-3-exit-x2F-exit"><a href="#2-3-exit-x2F-exit" class="headerlink" title="2.3 exit&#x2F;_exit"></a>2.3 exit&#x2F;_exit</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> _exit(<span class="type">int</span> status);</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>DESCRIPTION<br>       The  function  _exit()  terminates  the  calling  process “immediately”.  Any open file descriptors belonging to the process are closed; any children of the process are inherited by process 1, init, and the process’s parent is sent a SIGCHLD signal.</p>
+<p>​	  The value status is returned to the parent process as the process’s exit status, and can be collected using one of  the  wait<br>family of calls.</p>
+</blockquote>
+<p>调用_exit会终止当前进程，关闭当前进程打开的所有文件描述符，<strong>该进程的所有的子进程都会被进程标识符为1的进程继承（就是操作系统）</strong>，同时向该进程的父进程发送SIGCHLD信号，父进程可以通过wait接口获得子进程状态码status。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">exit</span><span class="params">(<span class="type">int</span> status)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>exit与_exit都可以用来终止进程，但有以下区别：</p>
+<ul>
+<li>_exit立刻终止进程，exit还会执行清理函数</li>
+<li>_exit不会刷新缓冲区，exit会刷新缓冲区</li>
+</ul>
+<p><strong>为了提高系统资源的利用效率，进程终止时，操作系统不会立即释放task_struct，会将它放入到数据结构缓冲池（slab分发器）中，留给下一个进程使用，从而避免频繁的创建task_strcut,增加系统的开销。</strong></p>
+<h4 id="2-4-wait"><a href="#2-4-wait" class="headerlink" title="2.4 wait"></a>2.4 wait</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/types.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/wait.h&gt;</span></span></span><br><span class="line"><span class="type">pid_t</span> <span class="title function_">wait</span><span class="params">(<span class="type">int</span> *status)</span>;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>DESCRIPTION<br>       All of these system calls are used to wait for state changes in a child of the calling process, and obtain information about the<br>       child whose state has changed.  A state change is considered to be: the child terminated; the child was stopped by a signal;  or<br>       the  child  was  resumed  by  a  signal.   In the case of a terminated child, performing a wait allows the system to release the<br>       resources associated with the child; if a wait is not performed, then the terminated child remains  in  a  “zombie”  state  </p>
+</blockquote>
+<p>wiat接口会阻塞等待某个子进程的状态改变。当子进程状态改变时，wait会获得子进程的状态，释放子进程的资源。如果没有调用wait，子进程将会保持“zombie”状态，成为僵尸进程。</p>
+<p>子进程状态改变意味着发生以下情况：</p>
+<ul>
+<li>子进程被终止</li>
+<li>子进程被信号暂停或重启</li>
+</ul>
+<p>参数的设置：</p>
+<ul>
+<li>status是输出型参数，有效位为16位，高8位是status，低8位分别是1位core dump标志和7位终止信号</li>
+</ul>
+<p><img src="http://lemon-pi.oss-cn-beijing.aliyuncs.com/img/3.3.png"></p>
+<p>我们可以右移8位获得status，按位与获得终止信号，也可以使用内核提供的宏来获得值</p>
+<ul>
+<li>WEXITSTATUS(status) 提取子进程退出码</li>
+<li>WTERMSIG(status) 提取子进程退出信号</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">RETURN VALUE</span><br><span class="line">	wait(): on success, returns the process ID of the terminated child; on error, -1 is returned.</span><br></pre></td></tr></table></figure>
+
+<p>成功返回子进程pid，否则返回-1</p>
+<h4 id="2-5-waitpid"><a href="#2-5-waitpid" class="headerlink" title="2.5  waitpid"></a>2.5  waitpid</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">pid_t</span> <span class="title function_">waitpid</span><span class="params">(<span class="type">pid_t</span> pid, <span class="type">int</span> *status, <span class="type">int</span> options)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>在wait基础上，waitpid设置了额外两个参数：</p>
+<p>pid：</p>
+<ul>
+<li>-1 等待任意子进程</li>
+<li>0 等待子进程的进程组id等于父进程id</li>
+<li>大于0 等待指定pid的子进程</li>
+</ul>
+<p>option：</p>
+<ul>
+<li>0 阻塞等待进程状态改变</li>
+<li>WNOHANG  非阻塞等待进程状态改变</li>
+<li>WCONTINUED 阻塞等待进程收到SIGCONT信号</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">RETURN VALUE</span><br><span class="line">	waitpid(): on success, returns the process ID of the child whose state has changed; if WNOHANG was specified  and  one  or  more</span><br><span class="line">       child specified by pid exist, but have not yet changed state, then 0 is returned.  On error, -1 is returned.</span><br></pre></td></tr></table></figure>
+
+<p>如果有子进程状态改变并等待成功，返回子进程pid。如果option参数设置的WNOHANG，并且存在子进程，但没有子进程状态改变，返回0，否则返回-1.</p>
+<p>以下是一个使用waipid的简单示例：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/types.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/wait.h&gt;</span></span></span><br><span class="line"><span class="type">void</span> <span class="title function_">func</span> <span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">int</span> i=<span class="number">3</span>;</span><br><span class="line">    <span class="keyword">while</span>(i--)</span><br><span class="line">    &#123;</span><br><span class="line">        sleep(<span class="number">2</span>);</span><br><span class="line">        <span class="built_in">std</span>::<span class="built_in">cout</span>&lt;&lt;<span class="string">&quot;我是子进程 pid:&quot;</span>&lt;&lt;getpid()&lt;&lt;<span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">exit</span>(<span class="number">1</span>);</span><br><span class="line">&#125;</span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">int</span> status =<span class="number">0</span>;</span><br><span class="line">    <span class="type">pid_t</span> pid = fork();</span><br><span class="line">    <span class="keyword">if</span>(pid ==<span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        func();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span>&#123;</span><br><span class="line">        <span class="built_in">std</span>::<span class="built_in">cout</span>&lt;&lt;<span class="string">&quot;我是父进程 pid:&quot;</span>&lt;&lt;getpid()&lt;&lt;<span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    sleep (<span class="number">15</span>);</span><br><span class="line">    waitpid(pid,&amp;status,<span class="number">0</span>);</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">cout</span>&lt;&lt;<span class="string">&quot;status:&quot;</span>&lt;&lt;WEXITSTATUS(status)&lt;&lt;<span class="string">&quot;signal:&quot;</span>&lt;&lt;WTERMSIG(status)&lt;&lt;<span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>以上代码，在主进程中sleep（15）后再执行waitpid释放资源，子进程退出后没有被回收时，就会处于“zombie”状态。</p>
+<p>通过监控脚本来检测进程状态：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">while :;do ps ajx | head -1 &amp;&amp; ps ajx | grep test| grep -v grep;sleep 1; echo &quot;########################&quot;; done</span><br></pre></td></tr></table></figure>
+
+<p>结果如下：</p>
+<p>如图所示，子进程8682退出后没被操作系统回收前，状态为Z+</p>
+<p><img src="http://lemon-pi.oss-cn-beijing.aliyuncs.com/img/3.6.png"></p>
+<p>执行完waitpid后，子进程资源被操作系统回收：</p>
+<p><img src="http://lemon-pi.oss-cn-beijing.aliyuncs.com/img/3.7.png"></p>
+<h2 id="3-进程间通信"><a href="#3-进程间通信" class="headerlink" title="3. 进程间通信"></a>3. 进程间通信</h2><h4 id="3-1-管道"><a href="#3-1-管道" class="headerlink" title="3.1 管道"></a>3.1 管道</h4><h4 id="3-2-共享内存"><a href="#3-2-共享内存" class="headerlink" title="3.2 共享内存"></a>3.2 共享内存</h4><h4 id="3-3-信号"><a href="#3-3-信号" class="headerlink" title="3.3 信号"></a>3.3 信号</h4> 
+      <!-- reward -->
+      
+      <div id="reword-out">
+        <div id="reward-btn">
+          Donate
+        </div>
+      </div>
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <div class="declare">
+      <ul class="post-copyright">
+        <li>
+          <i class="ri-copyright-line"></i>
+          <strong>Copyright： </strong>
+          
+          Copyright is owned by the author. For commercial reprints, please contact the author for authorization. For non-commercial reprints, please indicate the source.
+          
+        </li>
+      </ul>
+    </div>
+    
+    <footer class="article-footer">
+       
+<div class="share-btn">
+      <span class="share-sns share-outer">
+        <i class="ri-share-forward-line"></i>
+        分享
+      </span>
+      <div class="share-wrap">
+        <i class="arrow"></i>
+        <div class="share-icons">
+          
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="ri-weibo-fill"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="ri-wechat-fill"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="ri-qq-fill"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="ri-douban-line"></i>
+          </a>
+          <!-- <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a> -->
+          
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="ri-facebook-circle-fill"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="ri-twitter-fill"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="ri-google-fill"></i>
+          </a>
+        </div>
+      </div>
+</div>
+
+<div class="wx-share-modal">
+    <a class="modal-close" href="javascript:;"><i class="ri-close-circle-line"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//api.qrserver.com/v1/create-qr-code/?size=150x150&data=http://example.com/2023/04/29/%E8%BF%9B%E7%A8%8B/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div id="share-mask"></div>  
+    </footer>
+  </div>
+
+   
+  <nav class="article-nav">
+    
+    
+      <a href="/2023/04/26/%E7%BA%BF%E7%A8%8B/" class="article-nav-link">
+        <strong class="article-nav-caption">下一篇</strong>
+        <div class="article-nav-title">Linux下多线程编程及pthread库的使用</div>
+      </a>
+    
+  </nav>
+
+  
+   
+  
+   
+    <script src="https://cdn.staticfile.org/twikoo/1.4.18/twikoo.all.min.js"></script>
+    <div id="twikoo" class="twikoo"></div>
+    <script>
+        twikoo.init({
+            envId: ""
+        })
+    </script>
+ 
+</article>
+
+</section>
+      <footer class="footer">
+  <div class="outer">
+    <ul>
+      <li>
+        Copyrights &copy;
+        2015-2023
+        <i class="ri-heart-fill heart_icon"></i> Yun Jia
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+        
+        <span>
+  <span><i class="ri-user-3-fill"></i>Visitors:<span id="busuanzi_value_site_uv"></span></span>
+  <span class="division">|</span>
+  <span><i class="ri-eye-fill"></i>Views:<span id="busuanzi_value_page_pv"></span></span>
+</span>
+        
+      </li>
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      <li>
+        <!-- cnzz统计 -->
+        
+        <script type="text/javascript" src='https://s9.cnzz.com/z_stat.php?id=1278069914&amp;web_id=1278069914'></script>
+        
+      </li>
+    </ul>
+  </div>
+</footer>    
+    </main>
+    <div class="float_btns">
+      <div class="totop" id="totop">
+  <i class="ri-arrow-up-line"></i>
+</div>
+
+<div class="todark" id="todark">
+  <i class="ri-moon-line"></i>
+</div>
+
+    </div>
+    <aside class="sidebar on">
+      <button class="navbar-toggle"></button>
+<nav class="navbar">
+  
+  <div class="logo">
+    <a href="/"><img src="/images/ayer.svg" alt="嘉禾望岗"></a>
+  </div>
+  
+  <ul class="nav nav-main">
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/">主页</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/archives">归档</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/categories">分类</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/tags">标签</a>
+    </li>
+    
+  </ul>
+</nav>
+<nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      
+      <a class="nav-item-link nav-item-search"  title="Search">
+        <i class="ri-search-line"></i>
+      </a>
+      
+      
+      <a class="nav-item-link" target="_blank" href="/atom.xml" title="RSS Feed">
+        <i class="ri-rss-line"></i>
+      </a>
+      
+    </li>
+  </ul>
+</nav>
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+    </aside>
+    <div id="mask"></div>
+
+<!-- #reward -->
+<div id="reward">
+  <span class="close"><i class="ri-close-line"></i></span>
+  <p class="reward-p"><i class="ri-cup-line"></i>请我喝杯咖啡吧~</p>
+  <div class="reward-box">
+    
+    <div class="reward-item">
+      <img class="reward-img" src="/images/wechat%20(2).jpg">
+      <span class="reward-type">支付宝</span>
+    </div>
+    
+    
+    <div class="reward-item">
+      <img class="reward-img" src="/images/wechat.jpg">
+      <span class="reward-type">微信</span>
+    </div>
+    
+  </div>
+</div>
+    
+<script src="/js/jquery-3.6.0.min.js"></script>
+ 
+<script src="/js/lazyload.min.js"></script>
+
+<!-- Tocbot -->
+ 
+<script src="/js/tocbot.min.js"></script>
+
+<script>
+  tocbot.init({
+    tocSelector: ".tocbot",
+    contentSelector: ".article-entry",
+    headingSelector: "h1, h2, h3, h4, h5, h6",
+    hasInnerContainers: true,
+    scrollSmooth: true,
+    scrollContainer: "main",
+    positionFixedSelector: ".tocbot",
+    positionFixedClass: "is-position-fixed",
+    fixedSidebarOffset: "auto",
+  });
+</script>
+
+<script src="https://cdn.staticfile.org/jquery-modal/0.9.2/jquery.modal.min.js"></script>
+<link
+  rel="stylesheet"
+  href="https://cdn.staticfile.org/jquery-modal/0.9.2/jquery.modal.min.css"
+/>
+<script src="https://cdn.staticfile.org/justifiedGallery/3.8.1/js/jquery.justifiedGallery.min.js"></script>
+
+<script src="/dist/main.js"></script>
+
+<!-- ImageViewer -->
+ <!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <!-- Background of PhotoSwipe. 
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+
+        <!-- Container that holds slides. 
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                <!--  Controls are self-explanatory. Order can be changed. -->
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" style="display:none" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<link rel="stylesheet" href="https://cdn.staticfile.org/photoswipe/4.1.3/photoswipe.min.css">
+<link rel="stylesheet" href="https://cdn.staticfile.org/photoswipe/4.1.3/default-skin/default-skin.min.css">
+<script src="https://cdn.staticfile.org/photoswipe/4.1.3/photoswipe.min.js"></script>
+<script src="https://cdn.staticfile.org/photoswipe/4.1.3/photoswipe-ui-default.min.js"></script>
+
+<script>
+    function viewer_init() {
+        let pswpElement = document.querySelectorAll('.pswp')[0];
+        let $imgArr = document.querySelectorAll(('.article-entry img:not(.reward-img)'))
+
+        $imgArr.forEach(($em, i) => {
+            $em.onclick = () => {
+                // slider展开状态
+                // todo: 这样不好，后面改成状态
+                if (document.querySelector('.left-col.show')) return
+                let items = []
+                $imgArr.forEach(($em2, i2) => {
+                    let img = $em2.getAttribute('data-idx', i2)
+                    let src = $em2.getAttribute('data-target') || $em2.getAttribute('src')
+                    let title = $em2.getAttribute('alt')
+                    // 获得原图尺寸
+                    const image = new Image()
+                    image.src = src
+                    items.push({
+                        src: src,
+                        w: image.width || $em2.width,
+                        h: image.height || $em2.height,
+                        title: title
+                    })
+                })
+                var gallery = new PhotoSwipe(pswpElement, PhotoSwipeUI_Default, items, {
+                    index: parseInt(i)
+                });
+                gallery.init()
+            }
+        })
+    }
+    viewer_init()
+</script> 
+<!-- MathJax -->
+
+<!-- Katex -->
+
+<!-- busuanzi  -->
+ 
+<script src="/js/busuanzi-2.3.pure.min.js"></script>
+ 
+<!-- ClickLove -->
+
+<!-- ClickBoom1 -->
+
+<script src="https://cdn.staticfile.org/animejs/3.2.1/anime.min.js"></script>
+
+<script src="/js/clickBoom1.js"></script>
+ 
+<!-- ClickBoom2 -->
+
+<!-- CodeCopy -->
+
+<!-- CanvasBackground -->
+
+<script>
+  if (window.mermaid) {
+    mermaid.initialize({ theme: "forest" });
+  }
+</script>
+
+
+    
+    <div id="music">
+    
+    
+    
+    <iframe frameborder="no" border="1" marginwidth="0" marginheight="0" width="200" height="86"
+        src="//music.163.com/outchain/player?type=2&id=2027529783&auto=1&height=66"></iframe>
+</div>
+
+<style>
+    #music {
+        position: fixed;
+        right: 15px;
+        bottom: 0;
+        z-index: 998;
+    }
+</style>
+    
+    
+
+  </div>
+</body>
+
+</html>
