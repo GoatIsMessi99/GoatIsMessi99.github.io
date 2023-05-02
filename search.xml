@@ -414,8 +414,9 @@
 <li>WNOHANG  非阻塞等待进程状态改变</li>
 <li>WCONTINUED 阻塞等待进程收到SIGCONT信号</li>
 </ul>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">RETURN VALUE</span><br><span class="line">	waitpid(): on success, returns the process ID of the child whose state has changed; if WNOHANG was specified  and  one  or  more</span><br><span class="line">       child specified by pid exist, but have not yet changed state, then 0 is returned.  On error, -1 is returned.</span><br></pre></td></tr></table></figure>
-
+<blockquote>
+<p>RETURN VALUE<br>    waitpid(): on success, returns the process ID of the child whose state has changed; if WNOHANG was specified  and  one  or  more<br>       child specified by pid exist, but have not yet changed state, then 0 is returned.  On error, -1 is returned.</p>
+</blockquote>
 <p>如果有子进程状态改变并等待成功，返回子进程pid。如果option参数设置的WNOHANG，并且存在子进程，但没有子进程状态改变，返回0，否则返回-1.</p>
 <p>以下是一个使用waipid的简单示例：</p>
 <figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/types.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/wait.h&gt;</span></span></span><br><span class="line"><span class="type">void</span> <span class="title function_">func</span> <span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">int</span> i=<span class="number">3</span>;</span><br><span class="line">    <span class="keyword">while</span>(i--)</span><br><span class="line">    &#123;</span><br><span class="line">        sleep(<span class="number">2</span>);</span><br><span class="line">        <span class="built_in">std</span>::<span class="built_in">cout</span>&lt;&lt;<span class="string">&quot;我是子进程 pid:&quot;</span>&lt;&lt;getpid()&lt;&lt;<span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">exit</span>(<span class="number">1</span>);</span><br><span class="line">&#125;</span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">int</span> status =<span class="number">0</span>;</span><br><span class="line">    <span class="type">pid_t</span> pid = fork();</span><br><span class="line">    <span class="keyword">if</span>(pid ==<span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        func();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span>&#123;</span><br><span class="line">        <span class="built_in">std</span>::<span class="built_in">cout</span>&lt;&lt;<span class="string">&quot;我是父进程 pid:&quot;</span>&lt;&lt;getpid()&lt;&lt;<span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    sleep (<span class="number">15</span>);</span><br><span class="line">    waitpid(pid,&amp;status,<span class="number">0</span>);</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">cout</span>&lt;&lt;<span class="string">&quot;status:&quot;</span>&lt;&lt;WEXITSTATUS(status)&lt;&lt;<span class="string">&quot;signal:&quot;</span>&lt;&lt;WTERMSIG(status)&lt;&lt;<span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
@@ -432,7 +433,7 @@
 <h2 id="3-进程间通信"><a href="#3-进程间通信" class="headerlink" title="3. 进程间通信"></a>3. 进程间通信</h2><h3 id="3-1-管道"><a href="#3-1-管道" class="headerlink" title="3.1 管道"></a>3.1 管道</h3><blockquote>
 <p>In Linux, a pipe is a form of interprocess communication that enables data to be transferred between two processes. A pipe is a unidirectional data channel, which means data can flow only in one direction, from the output of one process to the input of another.</p>
 </blockquote>
-<p>管道是Linux中的一种进程间通信的方式。管道是单向数据通道，意味着数据只能在一个方向上传递，从一个进程的输出到一个进程的输入.</p>
+<p>管道是Linux中的一种使用缓冲区的进程间通信的方式。管道是单向数据通道，意味着数据只能在一个方向上传递，从一个进程的输出到一个进程的输入.</p>
 <p>我们在shell命令行中常用的 “ |” 就是管道命令。下面的示例中，将ps进程的输出通过管道传输给grep进程。</p>
 <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">ps ajx | grep server</span><br></pre></td></tr></table></figure>
 
@@ -445,10 +446,7 @@
 
 <blockquote>
 <p>DESCRIPTION</p>
-<pre><code>    The array pipefd is used to return two file descriptors referring to the ends of the pipe.   pipefd[0] refers  to  the read end of the pipe.  pipefd[1] refers to the write end of the pipe. 
-    Data written to the write end of the pipe 
-is buffered by the kernel until it is read from the read end of the pipe.
-</code></pre>
+<p>The array pipefd is used to return two file descriptors referring to the ends of the pipe. pipefd[0] refers to the read end of the pipe.  pipefd[1] refers to the write end of the pipe. Data written to the write end of the pipe is buffered by the kernel until it is read from the read end of the pipe.</p>
 </blockquote>
 <ul>
 <li>pipefd是输出型参数，调用pipe后，内核分别以读和写的方式打开同一个文件，将两次打开的文件描述符填入到数组中</li>
@@ -458,7 +456,7 @@ is buffered by the kernel until it is read from the read end of the pipe.
 <p>下面是Linux内核中匿名管道缓冲区的源码</p>
 <figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">pipe_buffer</span> &#123;</span></span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">page</span> *<span class="title">page</span>;</span></span><br><span class="line">	<span class="type">unsigned</span> <span class="type">int</span> offset, len;</span><br><span class="line">	<span class="type">const</span> <span class="class"><span class="keyword">struct</span> <span class="title">pipe_buf_operations</span> *<span class="title">ops</span>;</span></span><br><span class="line">	<span class="type">unsigned</span> <span class="type">int</span> flags;</span><br><span class="line">	<span class="type">unsigned</span> <span class="type">long</span> private;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
 
-<p>页面是操作系统管理内存的基本单位，它通常是4KB或8KB大小的连续内存块。struct page是用来管理页面的结构体，它存储了页面的状态和属性。每一个struct pipe_buffer对象就对应一个页面，管道的数据就存在这个页面中，struct page*page就指向管理这个页面的struct page结构体，通过offset和len就可以确定数据在页面中的位置和长度</p>
+<p>页面是操作系统管理物理内存的基本单位，它通常是4KB或8KB大小的连续内存块。struct page是用来管理页面的结构体，它存储了页面的状态和属性。每一个struct pipe_buffer对象就对应一个页面。当我们使用管道进行通信的时候，会先将写端进程地址空间里的缓冲区的数据通过page指针访问页面然后拷贝到页面中，offset和len就会记录数据的偏移量和长度，然后读端就可以通过page指针和offset和len去访问页面中的这段数据，拷贝到读端进程空间缓冲区。</p>
 <p>因为管道是单向数据通道，我们在使用pipe进行父子进程间通信，需要在父子进程中分别关闭读写的某一端，防止出现读写的错误</p>
 <ul>
 <li>如果是父进程向子进程发送数据：关闭父进程的读端，关闭子进程的写端</li>
@@ -472,19 +470,131 @@ is buffered by the kernel until it is read from the read end of the pipe.
 <p>上述示例中，父进程创建匿名管道后fork创建子进程，子进程会复制父进程的进程控制块task_struct中的文件信息file_struct:</p>
 <figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">files_struct</span> &#123;</span></span><br><span class="line">	<span class="comment">//...</span></span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">file</span> * <span class="title">fd_array</span>[<span class="title">NR_OPEN_DEFAULT</span>];</span><span class="comment">//文件数组</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
 
-<p>其中的fd_array就是文件指针数组，里面的指针就指向了进程打开的文件表。所以子进程的文件指针数组指向了父进程打开的文件表，其中就包括管道文件，所以父子进程就可以通过同一个管道文件进行通信。当父进程调用write向内核缓冲区写入数据时，内核就会通知子进程区读取数据。如果你对以上文件知识有疑惑，请参考<a href="https://blog.musnow.top/posts/2864480005/">Linux文件系统</a></p>
+<p>其中的fd_array就是文件指针数组，里面的指针就指向了进程打开的文件表。所以子进程的文件指针数组指向了父进程打开的文件表，其中就包括管道文件(如果你对以上文件知识有疑惑，请阅读<a href="https://blog.musnow.top/posts/2864480005/">Linux文件系统</a>)，所以父子进程就可以通过同一个管道文件进行通信。当父进程调用write向内核缓冲区写入数据时，内核就会通知子进程区读取数据</p>
 <ul>
 <li>当内核管道缓冲区为空时，read接口会阻塞等待write接口写入数据</li>
 <li>当内核管道缓冲区写满时，wtire接口会阻塞等待read接口读取数据</li>
 </ul>
-<p><strong>File结构体提供了用户级的I&#x2F;O 缓冲区，为什么还要专门使用内核级的管道缓冲区呢？</strong></p>
+<p>这个同步&#x2F;阻塞机制是Linux管道文件中自带的。内核中是通过等待队列来实现的：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">pipe_inode_info</span> &#123;</span></span><br><span class="line">	<span class="type">wait_queue_head_t</span> wait;</span><br><span class="line">	<span class="type">unsigned</span> <span class="type">int</span> nrbufs, curbuf;</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">page</span> *<span class="title">tmp_page</span>;</span></span><br><span class="line">	<span class="type">unsigned</span> <span class="type">int</span> readers;</span><br><span class="line">	<span class="type">unsigned</span> <span class="type">int</span> writers;</span><br><span class="line">	<span class="type">unsigned</span> <span class="type">int</span> waiting_writers;</span><br><span class="line">	<span class="type">unsigned</span> <span class="type">int</span> r_counter;</span><br><span class="line">	<span class="type">unsigned</span> <span class="type">int</span> w_counter;</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">fasync_struct</span> *<span class="title">fasync_readers</span>;</span></span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">fasync_struct</span> *<span class="title">fasync_writers</span>;</span></span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">inode</span> *<span class="title">inode</span>;</span></span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">pipe_buffer</span> <span class="title">bufs</span>[<span class="title">PIPE_BUFFERS</span>];</span></span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">// 等待队列</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> __<span class="title">wait_queue_head</span> &#123;</span></span><br><span class="line">	<span class="type">spinlock_t</span> lock;</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">list_head</span> <span class="title">task_list</span>;</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p><strong>文件系统提供了用户级的I&#x2F;O 缓冲区，为什么还要专门使用内核级的管道缓冲区呢？</strong></p>
 <ul>
 <li>隔离性：内核级别的缓冲区保证了管道通信数据不会泄露到其他进程，从而提供了较好的隔离性。这使得数据在进程间传输时具有更高的安全性和可靠性。</li>
 <li>同步和阻塞：内核级别的缓冲区允许管道在特定条件下进行同步和阻塞。例如，当管道为空时，读取操作会阻塞；当管道满时，写入操作会阻塞。这种特性有助于在进程间实现简单的同步和协作。</li>
 <li>数据持久性：内核级别的缓冲区可以确保在进程终止时数据不会丢失。例如，当一个进程在管道中写入数据后终止，另一个进程仍然可以从管道中读取这些数据。</li>
 <li>通用性：由于管道是一种通用的进程间通信机制，因此内核级别的缓冲区可以确保不同进程之间无需考虑底层实现细节就能进行通信。</li>
 </ul>
-<h4 id="3-1-2-命名管道"><a href="#3-1-2-命名管道" class="headerlink" title="3.1.2 命名管道"></a>3.1.2 命名管道</h4><h4 id="3-2-共享内存"><a href="#3-2-共享内存" class="headerlink" title="3.2 共享内存"></a>3.2 共享内存</h4><h4 id="3-3-信号"><a href="#3-3-信号" class="headerlink" title="3.3 信号"></a>3.3 信号</h4>]]></content>
+<h4 id="3-1-2-命名管道"><a href="#3-1-2-命名管道" class="headerlink" title="3.1.2 命名管道"></a>3.1.2 命名管道</h4><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">mkfifo</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *pathname, <span class="type">mode_t</span> mode)</span>;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>DESCRIPTION<br>       mkfifo()  makes a FIFO special file with name pathname.  mode specifies the FIFO’s permissions.  It is modified by the process’s<br>       umask in the usual way: the permissions of the created file are (mode &amp; ~umask).</p>
+<p>​	A FIFO special file is similar to a pipe, except that it is created in a different way.  Instead of being an anonymous  communications channel, </p>
+<p>​		a FIFO special file is entered into the file system by calling mkfifo().</p>
+</blockquote>
+<ul>
+<li>pathname  以文件系统的方式指定管道文件名</li>
+<li>mode 以文件系统的方式指定管道文件权限</li>
+</ul>
+<p>命名管道和匿名管道有以下区别：</p>
+<ul>
+<li>命名管道是通过文件系统中的文件名来访问的，而匿名管道不存在对应的文件，只存在于内存中，无法在文件系统中访问。</li>
+<li>命名管道可以在进程间传递数据，即使它们没有任何关系，只要它们能够访问同一个文件系统。而匿名管道只有通过 fork() 系统调用创建出来的父子进程之间可以使用匿名管道通信。</li>
+<li>命名管道具有持久性，即使所有使用该管道的进程都退出，命名管道仍然存在于文件系统中，直到显式地删除它。而匿名管道是暂时性的，只存在于相关进程运行期间。</li>
+</ul>
+<p>以下是服务端和多进程客户端使用命名管道文件通信的简单示例：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line">server.cc</span><br><span class="line">  <span class="number">1</span> <span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line">  <span class="number">2</span> <span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line">  <span class="number">3</span> <span class="meta">#<span class="keyword">include</span> <span class="string">&lt;fcntl.h&gt;</span></span></span><br><span class="line">  <span class="number">4</span> <span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line">  <span class="number">5</span> <span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/types.h&gt;</span></span></span><br><span class="line">  <span class="number">6</span> <span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/stat.h&gt;</span></span></span><br><span class="line">  <span class="number">7</span> <span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/wait.h&gt;</span></span></span><br><span class="line">  <span class="number">8</span> <span class="meta">#<span class="keyword">define</span> FIFONAME <span class="string">&quot;fifo&quot;</span></span></span><br><span class="line">  <span class="number">9</span> </span><br><span class="line"> <span class="number">10</span> <span class="type">int</span> <span class="title function_">main</span><span class="params">()</span></span><br><span class="line"> 11 &#123;</span><br><span class="line"> <span class="number">12</span>     mkfifo(FIFONAME,<span class="number">0666</span>);</span><br><span class="line"> <span class="number">13</span>     <span class="type">int</span> fd = open(FIFONAME,O_RDONLY);</span><br><span class="line"> <span class="number">14</span>     <span class="keyword">while</span>(<span class="literal">true</span>)</span><br><span class="line"> <span class="number">15</span>     &#123;   </span><br><span class="line"> <span class="number">16</span>         <span class="type">char</span> buf[<span class="number">1024</span>];</span><br><span class="line"> <span class="number">17</span>         <span class="type">size_t</span> s =read(fd,buf,<span class="keyword">sizeof</span>(buf));</span><br><span class="line"> <span class="number">18</span>         <span class="keyword">if</span>(s &gt; <span class="number">0</span>)</span><br><span class="line"> <span class="number">19</span>         &#123;</span><br><span class="line"> <span class="number">20</span>             <span class="built_in">printf</span>(<span class="string">&quot;%s\n&quot;</span>,buf);</span><br><span class="line"> <span class="number">21</span>         &#125;</span><br><span class="line"> <span class="number">22</span>         <span class="keyword">else</span> <span class="keyword">if</span>(s == <span class="number">0</span>)</span><br><span class="line"> <span class="number">23</span>         &#123;</span><br><span class="line"> <span class="number">24</span>             <span class="keyword">break</span>;</span><br><span class="line"> <span class="number">25</span>         &#125;</span><br><span class="line"> <span class="number">26</span>     &#125;</span><br><span class="line"> <span class="number">27</span> &#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line">client.cc</span><br><span class="line">  <span class="number">1</span> <span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line">  <span class="number">2</span> <span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line">  <span class="number">3</span> <span class="meta">#<span class="keyword">include</span> <span class="string">&lt;fcntl.h&gt;</span></span></span><br><span class="line">  <span class="number">4</span> <span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line">  <span class="number">5</span> <span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/types.h&gt;</span></span></span><br><span class="line">  <span class="number">6</span> <span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/stat.h&gt;</span></span></span><br><span class="line">  <span class="number">7</span> <span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/wait.h&gt;</span></span></span><br><span class="line">  <span class="number">8</span> <span class="meta">#<span class="keyword">define</span> FIFONAME <span class="string">&quot;fifo&quot;</span></span></span><br><span class="line">  <span class="number">9</span> </span><br><span class="line"> <span class="number">10</span> <span class="type">int</span> <span class="title function_">main</span><span class="params">()</span></span><br><span class="line"> 11 &#123;</span><br><span class="line"> <span class="number">12</span>     fork();</span><br><span class="line"> <span class="number">13</span>     <span class="type">char</span> info[<span class="number">20</span>]=<span class="string">&quot;hello world&quot;</span>;</span><br><span class="line"> <span class="number">14</span>     <span class="type">char</span> buf[<span class="number">100</span>];</span><br><span class="line"> <span class="number">15</span>     <span class="type">int</span> fd = open(FIFONAME,O_WRONLY);</span><br><span class="line"> <span class="number">16</span>     <span class="built_in">sprintf</span>(buf,<span class="string">&quot;ppid:%d pid:%d write:%s \n&quot;</span>,getppid(),getpid(),info);                                    <span class="number">17</span>     write(fd,buf,<span class="keyword">sizeof</span>(buf));</span><br><span class="line"> <span class="number">18</span>     wait(nullptr);</span><br><span class="line"> <span class="number">19</span> &#125;</span><br></pre></td></tr></table></figure>
+
+<p>输出结果</p>
+<p><img src="http://lemon-pi.oss-cn-beijing.aliyuncs.com/img/4.0.png"></p>
+<h3 id="3-2-共享内存"><a href="#3-2-共享内存" class="headerlink" title="3.2 共享内存"></a>3.2 共享内存</h3><p>共享内存是一种进程间通信的机制，它允许不同进程之间共享同一段物理内存区域，以达到高效传递大量数据的目的。在 Linux 系统中，共享内存由系统内核维护，使用时需要调用相应的系统调用，包括 <code>shmget()</code>、<code>shmat()</code>、<code>shmdt()</code>、<code>shmctl()</code>、<code>ftok()</code> 等.</p>
+<p><strong>共享内存和管道的区别：</strong></p>
+<ul>
+<li>共享内存直接访问内存，而管道需要通过内核缓冲区进行数据的拷贝，因此共享内存具有传输速度快、效率高的优点.</li>
+<li>共享内存是直接访问内存，因此不适合用于传输敏感数据，需要应用层自行实现锁机制等保护机制以确保数据的安全性.</li>
+<li>共享内存没有访问控制，需要用户设置访问控制，例如信号量.</li>
+</ul>
+<p>为了实现进程间通信，让不同进程间能访问到同一块内存，共享内存的实现机制类似于命名管道让用户自己指定管道文件路径，提供了<code>ftok()</code>接口让用户自己生成共享内存的编号.</p>
+<h4 id="3-2-1-ftok"><a href="#3-2-1-ftok" class="headerlink" title="3.2.1 ftok"></a>3.2.1 ftok</h4><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">key_t</span> <span class="title function_">ftok</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *pathname, <span class="type">int</span> proj_id)</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>pathname是工作文件路径</li>
+<li>proj_id是你的当前工程的编号（非0，至少8位）</li>
+</ul>
+<blockquote>
+<p>DESCRIPTION<br>       The  ftok() function uses the identity of the file named by the given pathname (which must refer to an existing, accessible file) and the least significant 8 bits of proj_id (which must be nonzero) to generate a key_t type System V IPC key</p>
+</blockquote>
+<p>ftok会根据你提供的两个参数生成一个内存空间的key，用户就可以通过这个key去申请内存空间.</p>
+<h4 id="3-2-2-shmget"><a href="#3-2-2-shmget" class="headerlink" title="3.2.2 shmget"></a>3.2.2 shmget</h4><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">shmget</span><span class="params">(<span class="type">key_t</span> key, <span class="type">size_t</span> size, <span class="type">int</span> shmflg)</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>key 就是ftok生成的内存空间key</li>
+<li>size是内存空间大小，应为4Kb的整数倍，因为系统I&#x2F;O的基本单位是4Kb，否则会出现内存空间浪费的情况</li>
+<li>shmflg是创建共享内存的方式</li>
+</ul>
+<p><code>IPC_CREAT:</code>创建共享内存。如果存在则获取，如果不存在则创建后获取</p>
+<p><code>IPC_EXCL: </code>必须配合IPC_CREAT使用，如果不存在指定的共享内存，就进行创建；如果该共享内存存在，则出错返回（即保证获取到的共享内存一定是当前进程创建的，是一个新的共享内存）</p>
+<p>返回值：</p>
+<blockquote>
+<p>RETURN VALUE<br>       On success, a valid shared memory identifier is returned.  On errir, -1 is returned, and  errno  is  set  to  indicate  the</p>
+<p>error.</p>
+</blockquote>
+<p><code>shmget</code>会帮我们在内存上开辟出一段空间，如果成功返回这块内存空间的唯一标识符，否则返回-1.</p>
+<h4 id="3-2-3-shmat-x2F-shmdt"><a href="#3-2-3-shmat-x2F-shmdt" class="headerlink" title="3.2.3 shmat&#x2F;shmdt"></a>3.2.3 shmat&#x2F;shmdt</h4><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">void</span> *<span class="title function_">shmat</span><span class="params">(<span class="type">int</span> shmid, <span class="type">const</span> <span class="type">void</span> *shmaddr, <span class="type">int</span> shmflg)</span>;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>shmid  shmget返回的内存空间标识符</li>
+<li>shmaddr 指定共享内存连接到当前进程中的地址位置。通常为空，表示让系统来选择共享内存的地址</li>
+<li>shmflg 使用共享内存的方式，一般设置为0,默认以读写打开</li>
+</ul>
+<p>返回值：</p>
+<blockquote>
+<p>RETURN VALUE<br>       On  success shmat() returns the address of the attached shared memory segment; on<br>       error (void *) -1 is returned, and errno is set to  indicate  the  cause  of  the<br>       error.</p>
+</blockquote>
+<p><code>shmat</code>会将共享内存空间和我们的进程关联起来，将这段共享内存通过页表映射到我们的进程地址空间上，我们将需要通信的进程分别和这块共享内存进行关联，就可以在各自的进程中使用同一块内存空间进行通信.如果创建成功就返回这块内存的起始地址.</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">shmdt</span><span class="params">(<span class="type">const</span> <span class="type">void</span> *shmaddr)</span>;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>shmaddr就是shmat的返回值</li>
+</ul>
+<blockquote>
+<p>RETURN VALUE</p>
+<p>​		On success shmdt() returns 0; on error -1 is returned, and errno is set to indicate the cause of the error.</p>
+</blockquote>
+<p>shmdt就是解除进程和共享内存的关联</p>
+<h4 id="3-2-4-shmctl"><a href="#3-2-4-shmctl" class="headerlink" title="3.2.4 shmctl"></a>3.2.4 shmctl</h4><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">shmctl</span><span class="params">(<span class="type">int</span> shmid, <span class="type">int</span> cmd, <span class="keyword">struct</span> shmid_ds *buf)</span>;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>shmid 内存空间的唯一标识符</li>
+<li>buf 一般设置为NULL</li>
+<li>cmd是操作类型</li>
+</ul>
+<p><code>IPC_RMID：</code>删除共享内存</p>
+<p><code>IPC_STAT：</code>把shmid_ds结构中的数据设置为共享内存的当前关联值，即用共享内存的当前关联值覆盖shmid_ds的值</p>
+<p><code>IPC_SET：</code>如果进程有足够的权限，就把共享内存的当前关联值设置为shmid_ds结构中给出的值、</p>
+<p>shmid_ds结构如下：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">shmid_ds</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="type">uid_t</span> shm_perm.uid;</span><br><span class="line">    <span class="type">uid_t</span> shm_perm.gid;</span><br><span class="line">    <span class="type">mode_t</span> shm_perm.mode;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>以下是一个创建共享内存的简单示例：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> PATHNAME <span class="string">&quot;/home/wyj/test&quot;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">key_t</span> key =ftok(PATHNAME,<span class="number">2107120119</span>);</span><br><span class="line">    <span class="type">int</span> id =shmget(key,<span class="number">4096</span>,IPC_CREAT | IPC_EXCL);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>通过ipc命令查看开辟的共享内存空间:</p>
+<blockquote>
+<p>ipcs -c #查看消息队列&#x2F;共享内存&#x2F;信号量<br>ipcs -s #单独查看信号量<br>ipcs -q #单独查看消息队列<br>ipcs -m #单独查看共享内存</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">ipcs -m </span><br></pre></td></tr></table></figure>
+
+<p><img src="http://lemon-pi.oss-cn-beijing.aliyuncs.com/img/4.1.png"></p>
+<p>进程关联共享内存后，进行通信：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line">server.cc</span><br><span class="line">    </span><br><span class="line"><span class="meta">#<span class="keyword">define</span> PATHNAME <span class="string">&quot;/home/wyj/test&quot;</span></span></span><br><span class="line">    </span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">key_t</span> key = ftok(PATHNAME, <span class="number">2107120119</span>);</span><br><span class="line">    <span class="type">int</span> id = shmget(key, <span class="number">4096</span>, IPC_CREAT | <span class="number">0666</span>);</span><br><span class="line">    <span class="type">int</span> *addr = (<span class="type">int</span> *)shmat(id, nullptr, <span class="number">0</span>);</span><br><span class="line">    sleep(<span class="number">5</span>);</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">9</span>; i++)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; addr[i] &lt;&lt; <span class="string">&quot; &quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">cout</span>&lt;&lt;<span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line">    shmdt(addr);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line">client.cc</span><br><span class="line">    </span><br><span class="line"><span class="meta">#<span class="keyword">define</span> PATHNAME <span class="string">&quot;/home/wyj/test&quot;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">key_t</span> key = ftok(PATHNAME, <span class="number">2107120119</span>);</span><br><span class="line">    <span class="type">int</span> id = shmget(key, <span class="number">4096</span>, IPC_CREAT | <span class="number">0666</span>);</span><br><span class="line">    <span class="type">int</span> *addr = (<span class="type">int</span> *)shmat(id, nullptr, <span class="number">0</span>);</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">9</span>; i++)</span><br><span class="line">    &#123;</span><br><span class="line">        addr[i] = i;</span><br><span class="line">    &#125;</span><br><span class="line">    shmdt(addr);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>执行结果：</p>
+<p><img src="http://lemon-pi.oss-cn-beijing.aliyuncs.com/img/4.2.png"></p>
+]]></content>
       <categories>
         <category>Linux</category>
       </categories>
