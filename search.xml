@@ -1,271 +1,184 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>Linux下多线程编程及pthread库的使用</title>
-    <url>/2023/04/26/%E7%BA%BF%E7%A8%8B/</url>
-    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="\assets\css\APlayer.min.css"><script src="\assets\js\APlayer.min.js" class="aplayer-secondary-script-marker"></script><h2 id="1-Linux下的线程"><a href="#1-Linux下的线程" class="headerlink" title="1. Linux下的线程"></a>1. Linux下的线程</h2><h4 id="1-1-Linux下线程与进程的关系"><a href="#1-1-Linux下线程与进程的关系" class="headerlink" title="1.1 Linux下线程与进程的关系"></a>1.1 Linux下线程与进程的关系</h4><ul>
-<li><p><strong>进程是操作系统分配资源的基本单位</strong></p>
+    <title>Tcp/Udp协议及Linux下Socket编程</title>
+    <url>/2023/05/12/Socket%E7%BC%96%E7%A8%8B/</url>
+    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="\assets\css\APlayer.min.css"><script src="\assets\js\APlayer.min.js" class="aplayer-secondary-script-marker"></script><h2 id="1-OSI七层模型"><a href="#1-OSI七层模型" class="headerlink" title="1. OSI七层模型"></a>1. OSI七层模型</h2><p>OSI是国际标准化组织（ISO）提出的网络体系结构模型，作为<strong>开放系统互连参考模型</strong>，是进行网络通信的基本框架。OS七层模型分别为：应用层、表示层、会话层、传输层、网络层、数据链路层、物理层，但是在实际网络通信框架中，一般只设有五层：应用层、传输层、网络层、数据链路层、物理层，将表示层和会话层的内容统一到应用层中。</p>
+<p><strong>报文：</strong></p>
+<p>报文 &#x3D; 报头 + 数据部分</p>
+<p>通过将网络划分成不同层结构，实现任务的划分，每一层都有自己对应的处理任务和特有的属性。</p>
+<p>不同层之间采用报文的方式来传递数据，报文由报头和数据部分组成，每一层都有自己的报头，其中报头就填充着每一层的属性字段。</p>
+<p>向下交付时，每一层向下交付的报文都会成为下一层的数据部分，下一层再组装上自己的报头以后就继续向下交付。</p>
+<p><img src="http://lemon-pi.oss-cn-beijing.aliyuncs.com/img/4.5.png"></p>
+<h2 id="2-传输层协议"><a href="#2-传输层协议" class="headerlink" title="2. 传输层协议"></a>2. 传输层协议</h2><p>在实际网络通信五层框架中，每一层都有对应的任务和执行任务的约束–协议，其中传输层的任务就是负责为<strong>端到端连接提供可靠的传输服务</strong>，对应的传输层协议就是Tcp&#x2F;Udp协议。</p>
+<p><strong>端口号：</strong></p>
+<p>传输层端到端指的就是端口号，端口号是主机上进程的唯一标识。通过端口号，数据从传输层向应用层交付时，就知道数据该交给哪一个进程。</p>
+<p><strong>套接字Socket：</strong></p>
+<p>Socket &#x3D; IP地址：端口号，例如：433.25.25.25：8081</p>
+<p>Socket标识着网络中一台主机上的一个进程</p>
+<p><strong>无连接服务和面向连接服务：</strong></p>
+<p>无连接服务指通信双方在进行通信之前，不需要进行连接操作，直接进行通信，从而提高通信的效率，但也因此不能保障通信的安全和可靠性。Udp协议就是提供无连接服务。</p>
+<p>面向连接服务指通信双方在进行通信之前，先需要建立通信双方之间的连接，从而对双方的通信进行实时的监控和管理，因此能保障通信的安全和可靠性，但会导致通信的效率降低。Tcp协议就是提供面向连接服务。</p>
+<h3 id="2-1-Udp协议"><a href="#2-1-Udp协议" class="headerlink" title="2.1 Udp协议"></a>2.1 Udp协议</h3><p>Udp协议提供无连接的数据报服务，一次发送一个报文，不对报文进行拆分和合并，而是保留这些报文的边界。</p>
+<h4 id="Udp报头格式："><a href="#Udp报头格式：" class="headerlink" title="Udp报头格式："></a><strong>Udp报头格式：</strong></h4><p><img src="http://lemon-pi.oss-cn-beijing.aliyuncs.com/img/4.4.png"></p>
+<ul>
+<li>源&#x2F;目的端口：发送方&#x2F;接受方对应进程的端口号</li>
+<li>总长度：报头+数据的长度</li>
+<li>校验和：检验Udp报文是否传输中出错</li>
+</ul>
+<h3 id="2-2-Tcp协议"><a href="#2-2-Tcp协议" class="headerlink" title="2.2 Tcp协议"></a>2.2 Tcp协议</h3><p>Tcp协议提供面向连接的字节流服务，通信前需要连接双方之间的连接，对发送数据的每一个字节都进行了编号，保证传送的数据无差错、不丢失、有序，可以对报文进行拆分和合并。</p>
+<h4 id="Tcp报头格式："><a href="#Tcp报头格式：" class="headerlink" title="Tcp报头格式："></a><strong>Tcp报头格式：</strong></h4><p><img src="http://lemon-pi.oss-cn-beijing.aliyuncs.com/img/4.3.png"></p>
+<ul>
+<li>源&#x2F;目的端口：发送方&#x2F;接受方对应进程的端口号</li>
+<li>序号：数据部分的第一个字节的编号</li>
+<li>确认号：接收方已经正确接收到的数据的最后一个字节的编号</li>
+<li>数据偏移：4位，数据范围 0101 - 1111，单位是4B，即报头长度是20B - 60B</li>
+<li>保留：保留字段，留作以后的使用</li>
+<li>UGR：置1时表明紧急指针字段有效，操作系统尽快读取紧急指针指向的数据段</li>
+<li>ACK：置1时表明确认号字段有效，Tcp协议规定在建立好连接后通信时，ACK段也必须置为1</li>
+<li>PSH：置1时表明操作系统不需等待接收缓冲区满，直接读取数据</li>
+<li>RST：置1时表明当前Tcp连接出错，重新建立连接</li>
+<li>SYN：置1时表明这个Tcp报文是Tcp连接报文或Tcp确认连接报文</li>
+<li>FIN：置1时表明这个是发送方断开连接请求</li>
+<li>窗口：表明发送数据的速度，值 &#x3D; min （接收方接收能力，发送方所处网络的拥塞情况）</li>
+<li>检验和：检验数据是否在传输过程出错</li>
+</ul>
+<h4 id="确认应答机制（ACK）："><a href="#确认应答机制（ACK）：" class="headerlink" title="确认应答机制（ACK）："></a>确认应答机制（ACK）：</h4><p>Tcp协议使用了确认应答机制来提高数据传输的可靠性，发送方会在Tcp报头的序号字段填写发送数据的第一个字节的编号，接受方在收到正确且有序的报文后，会在回复报文（ACK）的的确认号字段填上收到连续数据的最后一个字节编号，表明接收方已经正确收到了编号之前对应的所有数据，如果出现数据不连续的情况，例如收到了0-1000，2001-3000，3001-4000的Tcp报文，接收方就会在Tcp报文的确认好字段填上1001，表明编号1001后的报文没有收到，发送方会重传编号1001以后的Tcp报文，但此时会出现报文重复的情况，接收方会甄别并丢弃重复的Tcp报文。通过这种确认应答机制，可以保证数据的不丢失且有序。</p>
+<h4 id="超时重传机制："><a href="#超时重传机制：" class="headerlink" title="超时重传机制："></a>超时重传机制：</h4><p>Tcp协议使用超时重传机制来解决传输过程中丢包的情况，发生以下几种情况时，会进行Tcp报文的重传：</p>
+<ul>
+<li>发送的报文因为网络拥塞等原因，无法到达接收方主机，发送方超过一段时间没收到ACK就会进行重传</li>
+<li>接收方的ACK在网络拥塞等原因，无法到达发送方主机，发送方超过一段时间没收到ACK就会进行重传</li>
+</ul>
+<p>Linux为了保证无论在任何环境下都能比较高性能的通信, 因此会动态计算这个最大超时时间</p>
+<blockquote>
+<ul>
+<li><p>Linux中 超时以500ms为一个单位进行控制, 每次判定超时重发的超时</p>
+<p>时间都是500ms的整数倍</p>
 </li>
-<li><p><strong>线程是操作系统任务调度的基本单位</strong></p>
+<li><p>如果重发一次之后, 仍然得不到应答, 等待 2*500ms 后再进行重传</p>
 </li>
-<li><p><strong>Linux内核中的线程可以看作是轻量级进程</strong></p>
+<li><p>如果仍然得不到应答, 等待 4*500ms 进行重传. 依次类推, 以指数形式递增</p>
 </li>
-<li><p><strong>进程具有独立性，线程不具有独立性</strong></p>
-<p>我们知道，Linux内核在创建<strong>进程</strong>时：</p>
-<ol>
-<li>创建并初始化<strong>进程控制块 PCB（Process Control Block）</strong>：它记录了进程的状态、标识符、优先级等。</li>
-<li>为进程分配独立的虚拟进程地址空间，将程序、数据、库文件载入虚拟地址空间中。</li>
-<li>复制父进程的内存空间：因为Linux采取了<strong>写时拷贝COW（Copy-On-Write）</strong>的技术，该进程的内存页表是父进程内存页表的一份拷贝，只有子进程需要修改其中某个内存页时，子进程的内存页表才会重新建立内存页表到物理空间的映射</li>
-<li>复制父进程的文件描述符表</li>
-<li>复制父进程的环境变量和命令行参数</li>
-<li>复制父进程的信号处理器</li>
-</ol>
-<p>而Linux内核在创建<strong>线程</strong>时：</p>
-<p>  1.初始化线程控制块（Thread Control Block，TCB）</p>
-<p>  2.设置线程的堆栈、寄存器</p>
-<p>  3.设置线程的调度属性</p>
-<p>  4.加入到进程的线程组中，这些线程共享进程的部分资源</p>
-<p>这些创建出来的线程不创建地址空间，而是<strong>共享进程的地址空间和其他资源</strong>（文件描述符，信号处理器等），其创建的开销远小于进程，所以我们说Linux下线程可以看作是轻量级进程。</p>
-<p>进程拥有自己独立的进程地址空间，进程具有独立性，而线程共享进程的地址空间，所有线程不具有独立性。线程除了共享进程地址空间，也拥有自己的私有成员：线程标识符、线程栈、线程寄存器</p>
-<p><strong>线程栈和线程寄存器是线程的两个重要组成部分：</strong></p>
-<ul>
-<li>线程栈是一个特殊的内存区域，用于存储线程执行时的函数调用栈、局部变量、函数参数等数据。每个线程都有自己的线程栈，线程栈的大小在创建线程时可以指定。线程在执行过程中，会不断地向线程栈中压入和弹出函数调用的相关信息，从而实现程序的正常执行。</li>
-<li>线程寄存器是CPU中的一组特殊寄存器，用于存储线程执行时的上下文信息，包括程序计数器、栈指针、通用寄存器等。线程在执行过程中，需要不断地保存和恢复这些寄存器的值，以便在线程切换时保持线程的执行状态。</li>
-</ul>
-<p>在Linux系统中，线程栈和线程寄存器是由内核进行管理和调度的。线程栈和线程寄存器的分配和初始化工作是由内核在创建线程时完成的，当线程被切换时，内核会将线程栈和线程寄存器中的内容保存下来，然后切换到其他线程的执行上下文。因此，线程栈和线程寄存器的正确使用和管理对于线程的正常运行至关重要。</p>
+<li><p>累计到一定的重传次数, TCP认为网络或者对端主机出现异常, 强制关闭连接</p>
 </li>
 </ul>
-<h4 id="1-2-Linux下线程的种类"><a href="#1-2-Linux下线程的种类" class="headerlink" title="1.2  Linux下线程的种类"></a>1.2  Linux下线程的种类</h4><ol>
-<li>用户级线程（User-Level Thread，ULT）：这种线程是由用户空间的线程库（<strong>如 pthread库</strong>）实现的，线程的创建、调度、同步等都由线程库管理。内核对用户级线程是没有感知的，因此它们的调度和同步都是由用户空间的线程库完成的。由于用户级线程不需要进入内核空间，因此它们的切换比内核级线程快，但是它们无法利用多处理器。</li>
-<li>内核级线程（Kernel-Level Thread，KLT）：这种线程由内核创建和管理，它们的调度和同步都是由内核完成的。内核级线程可以利用多处理器，但是它们的切换比用户级线程慢。Linux 中的内核级线程是使用轻量级进程实现的，每个进程都可以拥有多个轻量级进程，也就是说，一个进程可以拥有多个内核级线程。</li>
-</ol>
-<h2 id="2-pthread库的使用"><a href="#2-pthread库的使用" class="headerlink" title="2. pthread库的使用"></a>2. pthread库的使用</h2><p>pthread是官方提供的用户级的线程库，我们口中所指的线程大多就是指phread库为我们提供的用户级线程。</p>
-<h4 id="2-1-头文件"><a href="#2-1-头文件" class="headerlink" title="2.1 头文件"></a>2.1 头文件</h4><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;pthread.h&gt;</span> <span class="comment">// 头文件 Linux系统默认带pthread库</span></span></span><br></pre></td></tr></table></figure>
-
-<p>pthread不属于标准库，编译时需要带上 -lpthread</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line">g++ test.cc -o test -lpthread</span><br></pre></td></tr></table></figure>
-
-<h4 id="2-2-pthread-create"><a href="#2-2-pthread-create" class="headerlink" title="2.2 pthread_create"></a>2.2 pthread_create</h4><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">pthread_create</span><span class="params">(<span class="type">pthread_t</span> *thread, <span class="type">const</span> <span class="type">pthread_attr_t</span> *attr,</span></span><br><span class="line"><span class="params">  <span class="type">void</span> *(*start_routine) (<span class="type">void</span> *), <span class="type">void</span> *arg)</span>;</span><br></pre></td></tr></table></figure>
-
-<blockquote>
-<p>DESCRIPTION</p>
-<p>​	   The  pthread_create()  function  starts  a new thread in the calling process</p>
 </blockquote>
-<p>这个接口会在当前进程中创建出一个用户级线程</p>
+<h4 id="TCP流量控制（滑动窗口）："><a href="#TCP流量控制（滑动窗口）：" class="headerlink" title="TCP流量控制（滑动窗口）："></a>TCP流量控制（滑动窗口）：</h4><p>为了消除通信双方网络环境和数据处理能力带来的数据传输能力不一致的问题，TCP使用了滑动窗口来进行传输速率的控制。</p>
+<p>在通信过程中，接收方会在Tcp报文的窗口字段填写自己的接收缓冲区的剩余大小（rwnd，接收窗口）来告诉发送方自己的数据接收能力，发送方在收到报文后，会再结合自身网络拥塞情况（cwnd，拥塞窗口）的情况，来动态调整发送窗口的大小。</p>
+<p>发送窗口 &#x3D; min （rwnd，cwnd）</p>
+<h4 id="TCP拥塞控制："><a href="#TCP拥塞控制：" class="headerlink" title="TCP拥塞控制："></a>TCP拥塞控制：</h4><p>TCP拥塞控制有两种算法：</p>
 <ul>
-<li>第一个参数是线程的id</li>
-<li>第二个参数是线程的属性，一般设置为nullptr</li>
-<li>第三个参数是函数指针，这个函数的返回值是void*  ，参数为void* ，创建出来的线程会去执行这个函数</li>
-<li>第四个参数是start_routine函数传给线程的参数</li>
+<li><p>慢开始和拥塞避免</p>
+<p>设立拥塞窗口阈值初始值为n</p>
+<p>慢开始阶段：cwnd初始值为1，以2倍增长（2 4 8 16 …)  直到等于阈值n，开始拥塞避免阶段</p>
+<p>拥塞避免阶段：线性增长，cwnd每次加1，直到出现网络拥塞，将拥塞窗口阈值设为此时cwnd的一半（假设出现网络拥塞时cwnd为							  34，则新的拥塞窗口阈值为17），然后将cwnd设为1，从新进入慢开始阶段</p>
+</li>
+<li><p>快恢复</p>
+</li>
+</ul>
+<p>​	当出现冗余ACK的时候，采用快恢复算法，将拥塞窗口阈值设为此时cwnd的一半，与拥塞避免阶段不同的是，cwnd不是从1开始，而是直接从新的拥塞窗口阈值开始线性增长。</p>
+<h4 id="TCP三次握手-x2F-四次挥手："><a href="#TCP三次握手-x2F-四次挥手：" class="headerlink" title="TCP三次握手&#x2F;四次挥手："></a>TCP三次握手&#x2F;四次挥手：</h4><p><img src="http://lemon-pi.oss-cn-beijing.aliyuncs.com/img/4.6.png"></p>
+<p><strong>服务端状态转换：</strong></p>
+<ul>
+<li><p>[CLOSED -&gt; LISTEN] 服务器端调用listen后进入LISTEN状态, 等待客户端连接</p>
+</li>
+<li><p>[LISTEN -&gt; SYN_RCVD] 一旦监听到连接请求(同步报文段), 就将该连接放入内核等待队列中, 并向客户端发送SYN确认报文</p>
+</li>
+<li><p>[SYN_RCVD -&gt; ESTABLISHED] 服务端一旦收到客户端的确认报文, 就进入ESTABLISHED状态, 可以进行读写数据了</p>
+</li>
+<li><p>[ESTABLISHED -&gt; CLOSE_WAIT] 当客户端主动关闭连接(调用close), 服务器会收到结束报文段, 服务器返回确认报文段并进入CLOSE_WAIT</p>
+</li>
+<li><p>[CLOSE_WAIT -&gt; LAST_ACK] 进入CLOSE_WAIT后说明服务器准备关闭连接(需要处理完之前的数据); 当</p>
+<p>服务器真正调用close关闭连接时, 会向客户端发送FIN, 此时服务器进入LAST_ACK状态, 等待最后一个</p>
+<p>ACK到来(这个ACK是客户端确认收到了FIN)</p>
+</li>
+<li><p>[LAST_ACK -&gt; CLOSED] 服务器收到了对FIN的ACK, 彻底关闭连接</p>
+</li>
+</ul>
+<p><strong>客户端状态转换：</strong></p>
+<ul>
+<li>[CLOSED -&gt; SYN_SENT] 客户端调用connect, 发送同步报文段</li>
+<li>[SYN_SENT -&gt; ESTABLISHED] connect调用成功, 则进入ESTABLISHED状态, 开始读写数据</li>
+<li>[ESTABLISHED -&gt; FIN_WAIT_1] 客户端主动调用close时, 向服务器发送结束报文段, 同时进入FIN_WAIT_1</li>
+<li>[FIN_WAIT_1 -&gt; FIN_WAIT_2] 客户端收到服务器对结束报文段的确认, 则进入FIN_WAIT_2, 开始等待服务器的结束报文段</li>
+<li>[FIN_WAIT_2 -&gt; TIME_WAIT] 客户端收到服务器发来的结束报文段, 进入TIME_WAIT, 并发出LAST_ACK</li>
+<li>[TIME_WAIT -&gt; CLOSED] 客户端要等待一个2MSL(Max Segment Life, 报文最大生存时间)的时间, 才会进入CLOSED状态</li>
+</ul>
+<p><strong>TIME_WAIT状态：</strong></p>
+<ul>
+<li>TCP协议规定,主动关闭连接的一方要处于TIME_ WAIT状态,等待两个MSL(maximum segment lifetime)的时间后才能关闭</li>
+<li>MSL是TCP报文的最大生存时间，设置为2MSL就能保证在两个传输方向上的尚未被接收或迟到的报文段都已经消失</li>
+<li>同时也是在理论上保证最后一个报文可靠到达(假设最后一个ACK丢失, 那么服务器会再重发一个FIN. 这时虽然客户端的进程不在了, 但是TCP连接还在, 仍然可以重发LAST_ACK)</li>
+</ul>
+<h2 id="3-Linux下Socket编程"><a href="#3-Linux下Socket编程" class="headerlink" title="3. Linux下Socket编程"></a>3. Linux下Socket编程</h2><h3 id="3-1-UdpSocket"><a href="#3-1-UdpSocket" class="headerlink" title="3.1 UdpSocket"></a>3.1 UdpSocket</h3><h4 id="3-1-1-socket"><a href="#3-1-1-socket" class="headerlink" title="3.1.1 socket"></a>3.1.1 socket</h4><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">socket</span><span class="params">(<span class="type">int</span> domain, <span class="type">int</span> type, <span class="type">int</span> protocol)</span>;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>domain 作用域 本地或网络</li>
 </ul>
 <blockquote>
-<p>RETURN VALUE<br>       On success, pthread_create() returns 0; on error, it returns an error number, and the contents of *thread are undefined.</p>
+<p>Name               					  Purpose                         				        Man page<br>AF_UNIX, AF_LOCAL  		  Local communication                          unix(7)<br>AF_INET             				    IPv4 Internet protocols                       ip(7)<br>AF_INET6           					IPv6 Internet protocols                       ipv6(7)<br>AF_IPX              					  IPX - Novell protocols<br>AF_NETLINK                          Kernel user interface device              netlink(7)<br>AF_X25                                   ITU-T X.25 &#x2F; ISO-8208 protocol          x25(7)<br>AF_AX25                                Amateur radio AX.25 protocol<br>AF_ATMPVC                          Access to raw ATM PVCs<br>AF_APPLETALK                     Appletalk                                               ddp(7)<br>AF_PACKET                           Low level packet interface                  packet(7)</p>
 </blockquote>
-<p>创建成功时，返回值为0，创建失败返回错误码。</p>
-<h4 id="2-3-pthread-join"><a href="#2-3-pthread-join" class="headerlink" title="2.3 pthread_join"></a>2.3 pthread_join</h4><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">pthread_join</span><span class="params">(<span class="type">pthread_t</span> thread, <span class="type">void</span> **retval)</span>;</span><br></pre></td></tr></table></figure>
-
-<blockquote>
-<p>DESCRIPTION<br>       The  pthread_join() function waits for the thread specified by thread to terminate.  If that thread has already terminated, then pthread_join() returns immediately.  </p>
-<p>​	   The thread specified by thread must be joinable.</p>
-</blockquote>
-<p>这个接口会一直阻塞等待目标线程执行完毕后回收资源，如果线程已经被回收，会直接返回。</p>
-<p>The thread specified by thread must be joinable. 意思是这个线程必须是joinable属性（创建线程时不指定属性的话默认是joinable）或者没有被显式的剥离（调用pthread_detach)。</p>
-<p>由于线程占用的资源不会在线程执行完时自己释放，所以需要其他线程执行pthread_join（或者同时调用pthread_detach和pthread_exit)来释放资源，否则就会导致资源的泄露。</p>
 <ul>
-<li>第一个参数是等待的线程id</li>
-<li>第二个参数可以接收等待的线程执行完毕后的返回值</li>
+<li>type 报文类型</li>
 </ul>
 <blockquote>
-<p>RETURN VALUE<br>       On success, pthread_join() returns 0; on error, it returns an error number.</p>
+<p>SOCK_STREAM   字节流 Tcp通信选项</p>
+<p>SOCK_DGRAM    数据报 Udp通信选项</p>
+<p>SOCK_RAW          原始格式</p>
 </blockquote>
-<p>等待成功返回0，否则返回错误码</p>
-<p>以下是一个简单的线程创建和等待回收的示例</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">void</span>* <span class="title function_">run</span><span class="params">(<span class="type">void</span> *args)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">cout</span>&lt;&lt;<span class="string">&quot;run&quot;</span>&lt;&lt;<span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">pthread_t</span> t;</span><br><span class="line">    <span class="keyword">if</span>(pthread_create(&amp;t,nullptr,run,nullptr) != <span class="number">0</span> )</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">std</span>::<span class="built_in">cerr</span>&lt;&lt;<span class="string">&quot;pthread_create error\n&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 阻塞等待线程回收</span></span><br><span class="line">    <span class="keyword">if</span>(pthread_join(t,nullptr) == <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">std</span>::<span class="built_in">cout</span>&lt;&lt;<span class="string">&quot;pthread_join success\n&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125; </span><br></pre></td></tr></table></figure>
-
-<p>执行结果：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">[wyj@VM-20-8-centos ]$ g++ test.cc -o test -lpthread -std=c++11</span><br><span class="line">[wyj@VM-20-8-centos ]$ ./test</span><br><span class="line">run</span><br><span class="line">pthread_join success</span><br></pre></td></tr></table></figure>
-
-<h4 id="2-3-pthread-exit"><a href="#2-3-pthread-exit" class="headerlink" title="2.3 pthread_exit"></a>2.3 pthread_exit</h4><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">pthread_exit</span><span class="params">(<span class="type">void</span> *retval)</span>;</span><br></pre></td></tr></table></figure>
-
+<ul>
+<li>protocol  一般设为0</li>
+</ul>
 <blockquote>
-<p>DESCRIPTION<br>       The  pthread_exit()  function  terminates  the calling thread and returns a value via retval that (if the thread is joinable) is<br>       available to another thread in the same process that calls pthread_join</p>
+<p>RETURN VALUE<br>       On success, a file descriptor for the new socket is returned.  On error, -1 is returned, and errno is set appropriately.</p>
 </blockquote>
-<p>这个接口可以终止运行的线程，进程中其他没有被剥离（调用pthread_detach)的线程可以通过pthread_join接收这个被终止线程的返回值</p>
+<p>Linux一切皆文件，socket创建一个socket文件，返回该文件的文件描述符(失败返回-1）。socket文件内部针对网络通信封装了各种API，字段，将网络通信转化为对文件的操作。</p>
+<h4 id="3-1-2-bind"><a href="#3-1-2-bind" class="headerlink" title="3.1.2 bind"></a>3.1.2 bind</h4><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">bind</span><span class="params">(<span class="type">int</span> sockfd, <span class="keyword">struct</span> sockaddr *my_addr, <span class="type">socklen_t</span> addrlen)</span>;</span><br></pre></td></tr></table></figure>
+
 <ul>
-<li>参数retval的值可以被其他线程通过pthread_join获取</li>
+<li>sockfd   socket文件描述符</li>
+<li>my_addr  网络结构体，填充IP、IP协议类型、端口</li>
+<li>addrlen  结构体大小</li>
 </ul>
-<p>Linux下线程结束执行有以下几种情况:</p>
+<h5 id="struct-sockaddr："><a href="#struct-sockaddr：" class="headerlink" title="struct sockaddr："></a>struct sockaddr：</h5><blockquote>
+<p>由于早期c语言不支持void *，所以采用了统一的struct sockaddr结构体来接收不同类型的作用域结构体。我们需要将所选作用域结构体的字段填充好，再强转成 struct sockaddr * </p>
+<p>IPv4协议对应的网络结构体 ：struct sockaddr_in     IPv6协议对应的网络结构体： struct socaddr_in6</p>
+</blockquote>
+<p><img src="http://lemon-pi.oss-cn-beijing.aliyuncs.com/img/4.7.png"></p>
+<p>bind会将my_addr结构体中的各个属性和进程进行绑定，my_addr中的IP字段作为进程所在主机的IP地址，端口字段作为该进程的标识符，到达传输层的报文就会根据端口号向应用层对应的进程交付数据</p>
+<p><img src="http://lemon-pi.oss-cn-beijing.aliyuncs.com/img/4.8.png"></p>
+<h4 id="3-1-3-recvfrom"><a href="#3-1-3-recvfrom" class="headerlink" title="3.1.3 recvfrom"></a>3.1.3 recvfrom</h4><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">ssize_t</span> <span class="title function_">recvfrom</span><span class="params">(<span class="type">int</span> sockfd, <span class="type">void</span> *buf, <span class="type">size_t</span> len, <span class="type">int</span> flags,</span></span><br><span class="line"><span class="params">                 <span class="keyword">struct</span> sockaddr *src_addr, <span class="type">socklen_t</span> *addrlen)</span>;</span><br></pre></td></tr></table></figure>
+
 <ul>
-<li>线程将指定函数体中的代码执行完后自行结束；</li>
-<li>线程执行过程中，被同一进程中的其它线程（包括主线程）强制终止；</li>
-<li>线程执行过程中，遇到 pthread_exit() 函数结束执行。</li>
+<li>sockfd  socket文件描述符</li>
+<li>buf  接收数据缓冲区</li>
+<li>len 缓冲区大小</li>
+<li>flag  等待数据方式，0为阻塞等待</li>
+<li>src_addr 输入输出型参数，可以获取客户端的IP和端口号</li>
 </ul>
-<p>下面给出几个简单的使用示例：</p>
-<p><strong>通过pthread_exit退出线程</strong></p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">void</span> *<span class="title function_">run</span><span class="params">(<span class="type">void</span> *args)</span></span><br><span class="line">&#123;</span><br><span class="line">    pthread_exit(<span class="string">&quot;pthread_exit&quot;</span>);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;run\n&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">pthread_t</span> t;</span><br><span class="line">    <span class="keyword">if</span> (pthread_create(&amp;t, <span class="literal">NULL</span>, run, <span class="literal">NULL</span>) != <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;pthread_create error\n&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="type">void</span> *ret;</span><br><span class="line">    <span class="comment">// 阻塞等待线程回收</span></span><br><span class="line">    <span class="keyword">if</span> (pthread_join(t, &amp;ret) == <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">       <span class="built_in">printf</span>(<span class="string">&quot;pthread_join success\n&quot;</span>);</span><br><span class="line">       <span class="built_in">printf</span>(<span class="string">&quot;%s\n&quot;</span>,(<span class="type">char</span>*)ret);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>执行结果：</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line">[wyj@VM<span class="number">-20</span><span class="number">-8</span>-centos]$ gcc test.c -o test -lpthread</span><br><span class="line">[wyj@VM<span class="number">-20</span><span class="number">-8</span>-centos]$ ./test</span><br><span class="line">pthread_join success</span><br><span class="line">pthread_exit</span><br></pre></td></tr></table></figure>
-
-<p>由结果可知，线程调用pthread_exit后提前退出，没有执行后面的printf(“run\n”)，主线程通过pthread_join获得退出值</p>
-<p><strong>强制退出线程</strong></p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">void</span> *<span class="title function_">run</span><span class="params">(<span class="type">void</span> *args)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;run\n&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">pthread_t</span> t;</span><br><span class="line">    <span class="keyword">if</span> (pthread_create(&amp;t, <span class="literal">NULL</span>, run, <span class="literal">NULL</span>) != <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;pthread_create error\n&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;main thread exit\n&quot;</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>执行结果：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">[wyj@VM-20-8-centos]$ gcc test.c -o test -lpthread</span><br><span class="line">[wyj@VM-20-8-centos]$ ./test</span><br><span class="line">main thread exit</span><br></pre></td></tr></table></figure>
-
-<p>由执行结果可知，创建出来的线程并没有执行run函数，这是因为本次运行，cpu的调度使得主线程先执行，而且主线程并没有调用pthread_join去阻塞等待子线程，当主线程执行return 0的时候会调用系统接口exit(), exit()会终止进程内的所有线程，所以子线程没有执行run函数就被强制退出了。</p>
-<p>如果我们用pthread_exit提前退出主线程，不执行return 0：</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">void</span> *<span class="title function_">run</span><span class="params">(<span class="type">void</span> *args)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;run\n&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">pthread_t</span> t;</span><br><span class="line">    <span class="keyword">if</span> (pthread_create(&amp;t, <span class="literal">NULL</span>, run, <span class="literal">NULL</span>) != <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;pthread_create error\n&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    pthread_exit(<span class="literal">NULL</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>执行结果：</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line">[wyj@VM<span class="number">-20</span><span class="number">-8</span>-centos]$ gcc test.c -o test -lpthread</span><br><span class="line">[wyj@VM<span class="number">-20</span><span class="number">-8</span>-centos]$ ./test</span><br><span class="line">run</span><br></pre></td></tr></table></figure>
-
-<p>由结果可知，主线程提前退出，没有执行return 0，子线程执行了run函数。pthread_exit退出当前线程，不会影响其他线程。</p>
-<p><strong>此外，pthread_exit() 可以自动调用线程清理程序（本质是一个由 pthread_cleanup_push() 指定的自定义函数），return 则不具备这个能力。总之在实际场景中，如果想终止某个子线程执行，强烈建议大家使用 pthread_exit() 函数。</strong></p>
-<h4 id="2-4-pthread-detach"><a href="#2-4-pthread-detach" class="headerlink" title="2.4 pthread_detach"></a>2.4 pthread_detach</h4><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">pthread_detach</span><span class="params">(<span class="type">pthread_t</span> thread)</span>;</span><br></pre></td></tr></table></figure>
-
 <blockquote>
-<p>DESCRIPTION<br>       The  pthread_detach()  function  marks  the  thread  identified  by  thread as detached.  When a detached thread terminates, its<br>       resources are automatically released back to the system without the need for another thread to join with the terminated thread.</p>
+<p>RETURN VALUE<br>       These  calls  return the number of bytes received, or -1 if an error occurred.  In the event of an error, errno is set to indicate the error.  The return value<br>       will be 0 when the peer has performed an orderly shutdown.</p>
 </blockquote>
-<p>这个接口会将线程的状态设置为detached，当这个线程执行结束时，资源会被操作系统自动回收，不需要使用者手动调用pthread_join来回收。</p>
-<ul>
-<li>参数为线程的id</li>
-</ul>
-<p>我们知道，如果一个线程执行结束但还没有被join时，他的状态类似与进程中的僵尸进程（Zombie Process），需要创建线程的人手动调用pthread_join阻塞回收资源。</p>
-<p>但有时我们并不想阻塞等待，导致效率降低，同时为了避免资源泄露，就可以使用pthread_detach，让操作系统替我们管理线程。</p>
-<p>通常，在剥离子线程时，我们会让主线程保持在后台运行（常驻内存的程序），从而避免主线程退出，操作系统就自动回收被剥离的子线程，从而避免子线程还未执行完就退出的问题。</p>
-<h4 id="2-5-gettid"><a href="#2-5-gettid" class="headerlink" title="2.5 gettid"></a>2.5 gettid</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">pid_t gettid(void);</span><br></pre></td></tr></table></figure>
-
-<p>头文件：</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/types.h&gt;</span></span></span><br></pre></td></tr></table></figure>
-
-<blockquote>
-<p>DESCRIPTION<br>       gettid()  returns the caller’s thread ID (TID).  In a single-threaded process, the thread ID is equal to the process ID (PID, as<br>       returned by getpid().  In a multithreaded process, all threads have the same PID, but each one has a unique TID.</p>
-</blockquote>
-<p>gettid可以获取当前线程的线程tid，当进程内只有一个线程的时候，线程的tid等于进程的pid</p>
-<p><strong>gettid是系统接口，需要通过syscall来调用</strong></p>
-<h4 id="2-6-syscall"><a href="#2-6-syscall" class="headerlink" title="2.6 syscall"></a>2.6 syscall</h4><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">syscall</span><span class="params">(<span class="type">int</span> number, ...)</span>;</span><br></pre></td></tr></table></figure>
-
-<p>头文件：</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/syscall.h&gt;</span>   <span class="comment">/* For SYS_xxx definitions */</span></span></span><br></pre></td></tr></table></figure>
-
-<blockquote>
-<p>syscall()  is  a  small library function that invokes the system call whose assembly language interface has the specified number with the specified arguments.  Employing syscall() is useful, for example, when invoking a system call that has no wrapper function in the C library.</p>
-<p>syscall() saves CPU registers before making the system call, restores the registers upon return from the system call, and stores any error code returned by the system call in errno if an error occurs.</p>
-</blockquote>
-<p>sycall()是一个小型库函数，它调用系统调用，其汇编语言接口具有指定编号和指定参数。例如，当调用C库中没有包装器函数的系统调用时，使用sycall()是有用的。</p>
-<p>syscall()在进行系统调用之前保存CPU寄存器，在系统调用返回时恢复寄存器，并存储error中的错误码</p>
-<p>以下是一个简单示例：</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/syscall.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/types.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> *argv[])</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">pid_t</span> tid;</span><br><span class="line"></span><br><span class="line">    tid = syscall(SYS_gettid);</span><br><span class="line">    tid = syscall(SYS_tgkill, getpid(), tid);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-
-<h2 id="3-线程互斥"><a href="#3-线程互斥" class="headerlink" title="3.线程互斥"></a>3.线程互斥</h2><h4 id="3-1-基本概念"><a href="#3-1-基本概念" class="headerlink" title="3.1 基本概念"></a>3.1 基本概念</h4><p>线程互斥是指在多个线程中，对同一临界资源的访问进行限制，保证同一时间只有一个线程能够访问该资源，以避免多个线程同时修改同一个资源而导致的数据不一致问题。</p>
-<h4 id="3-2-临界资源"><a href="#3-2-临界资源" class="headerlink" title="3.2 临界资源"></a>3.2 临界资源</h4><p>临界资源是指共享的一段代码、一组数据或一块内存区域等，他们能被多个线程访问、修改，所以需要通过互斥访问来保证数据一致性的资源。比如，在一个多线程程序中，多个线程可能同时访问同一份数据结构，这时就需要使用临界资源的互斥访问来保证数据的正确性。</p>
-<h4 id="3-3-锁"><a href="#3-3-锁" class="headerlink" title="3.3 锁"></a>3.3 锁</h4><p><strong>锁是一种解决多线程访问临界资源的冲突一种技术。</strong>锁的实现依赖于操作系统的调度和底层硬件的原子性操作。</p>
-<h4 id="3-4-pthread-mutex"><a href="#3-4-pthread-mutex" class="headerlink" title="3.4 pthread_mutex"></a>3.4 pthread_mutex</h4><p>pthread_mutex是pthread库中实现的互斥锁，他的实现依赖于futex（fast userspace mutex）系统调用，它是一个基于用户空间和内核空间的协同机制，主要作用是将用户空间的线程挂起等待某个事件发生，并在事件发生时唤醒他们。futex底层实现中涉及到CPU提供的原子操作.</p>
-<p>当一个线程想要加锁时，它会首先尝试在用户空间中使用原子操作（如CAS）来获取锁，如果获取成功，则直接返回；否则，线程会调用futex_wait函数挂起自己，并在内核中等待锁的释放。当锁被持有线程释放时，它会调用futex_wake函数唤醒等待的线程，使它们重新竞争锁。在这个过程中，操作系统内核会对锁进行一些状态的维护，例如是否有线程正在等待锁、锁的拥有者等等。</p>
-<p>以下是X86架构CPU加锁过程汇编指令的简单示例：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">lock:</span><br><span class="line">    mov eax, 1   ; 将eax寄存器设置为1</span><br><span class="line">    xchg eax, [lock] ; 将eax寄存器中的值与lock变量中的值进行交换，lock变量中的值变为1</span><br><span class="line">    test eax, eax   ; 测试eax寄存器的值是否为0，为0则代表有锁资源</span><br><span class="line">    jnz lock    ; 如果eax寄存器的值不为0，跳转到lock标签处，继续尝试获取锁</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>recvfrom会返回接收到数据的字节数</p>
+<h4 id="3-1-4-sendto"><a href="#3-1-4-sendto" class="headerlink" title="3.1.4 sendto"></a>3.1.4 sendto</h4><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">ssize_t</span> <span class="title function_">sendto</span><span class="params">(<span class="type">int</span> sockfd, <span class="type">const</span> <span class="type">void</span> *buf, <span class="type">size_t</span> len, <span class="type">int</span> flags,</span></span><br><span class="line"><span class="params">                      <span class="type">const</span> <span class="keyword">struct</span> sockaddr *dest_addr, <span class="type">socklen_t</span> addrlen)</span>;</span><br></pre></td></tr></table></figure>
 
 <ul>
-<li>lock初始化值为0,0代表有锁资源，1代表无锁资源</li>
-<li>在单处理机中，一次只有一个线程能上处理机执行xchg指令，是原子性操作</li>
-<li>实际的锁实现会更加复杂，涉及到缓存一致性、总线锁定等底层细节。</li>
+<li>sockfd  socket文件描述符</li>
+<li>buf  发送数据缓冲区</li>
+<li>len   发送数据缓冲区大小</li>
+<li>flags  一般设为0</li>
+<li>dest_addr 输入型参数，向服务器发送本地的IP和进程对应的端口号</li>
 </ul>
-<p>以下是pthread库提供的关于锁操作的接口：</p>
-<p><strong>锁变量：</strong></p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">pthread_mutex_t</span> </span><br></pre></td></tr></table></figure>
+<p>以下是一个基于Udp套接字编写的客户端&#x2F;服务端简单实例</p>
+<p><strong>服务端：</strong></p>
+<figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> BUF_SIZE 1024</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Udpserver</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Udpserver</span>(<span class="type">uint16_t</span> port, std::string ip = <span class="string">&quot;&quot;</span>)</span><br><span class="line">        : <span class="built_in">port_</span>(port), <span class="built_in">ip_</span>(ip), <span class="built_in">sockfd_</span>(<span class="number">-1</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        sockfd_ = <span class="built_in">socket</span>(AF_INET, SOCK_DGRAM, <span class="number">0</span>);</span><br><span class="line">        <span class="keyword">if</span> (sockfd_ &lt; <span class="number">0</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="built_in">log</span>(FATAL, <span class="string">&quot;create server socket err&quot;</span>);</span><br><span class="line">            <span class="built_in">exit</span>(<span class="number">-1</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">struct</span> <span class="title class_">sockaddr_in</span> local;</span><br><span class="line">        local.sin_addr.s_addr = ip_.<span class="built_in">empty</span>() ? <span class="built_in">htonl</span>(INADDR_ANY) : <span class="built_in">inet_addr</span>(ip_.<span class="built_in">c_str</span>());</span><br><span class="line">        local.sin_family = AF_INET;</span><br><span class="line">        local.sin_port = port_;</span><br><span class="line">        <span class="keyword">if</span> (<span class="built_in">bind</span>(sockfd_, (<span class="type">const</span> sockaddr *)&amp;local, <span class="built_in">sizeof</span>(local)) &lt; <span class="number">0</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="built_in">log</span>(FATAL, <span class="string">&quot;server bind socket err&quot;</span>);</span><br><span class="line">            <span class="built_in">exit</span>(<span class="number">-1</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="built_in">log</span>(DEBUG,<span class="string">&quot;server bind success&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">loop</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="type">char</span> buffer[BUF_SIZE];</span><br><span class="line">        <span class="keyword">while</span> (<span class="literal">true</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="comment">// 输出型参数</span></span><br><span class="line">            <span class="keyword">struct</span> <span class="title class_">sockaddr_in</span> peer;</span><br><span class="line">            <span class="type">socklen_t</span> len = <span class="built_in">sizeof</span>(peer);</span><br><span class="line">            <span class="type">ssize_t</span> s = <span class="built_in">recvfrom</span>(sockfd_, buffer, <span class="built_in">sizeof</span>(buffer), <span class="number">0</span>, (<span class="keyword">struct</span> sockaddr *)&amp;peer, &amp;len);</span><br><span class="line">            <span class="keyword">if</span> (s &gt; <span class="number">0</span>)</span><br><span class="line">            &#123;</span><br><span class="line">                buffer[s] = <span class="string">&#x27;\0&#x27;</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">else</span></span><br><span class="line">            &#123;</span><br><span class="line">                <span class="built_in">log</span>(WARNING, <span class="string">&quot;recvfrom fail&quot;</span>);</span><br><span class="line">                <span class="keyword">continue</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="built_in">log</span>(INFO, <span class="string">&quot;[%s:%d]# %s&quot;</span>, <span class="built_in">inet_ntoa</span>(peer.sin_addr), <span class="built_in">ntohs</span>(peer.sin_port), buffer);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    std::string ip_;</span><br><span class="line">    std::<span class="type">uint16_t</span> port_;</span><br><span class="line">    <span class="type">int</span> sockfd_;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">(<span class="type">int</span> argc,<span class="type">char</span> *argv[])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (argc != <span class="number">2</span> &amp;&amp; argc != <span class="number">3</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">log</span>(FATAL, <span class="string">&quot;usage:[%s port [ip]]&quot;</span>, argv[<span class="number">0</span>]);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">// ./server port</span></span><br><span class="line">        <span class="keyword">if</span> (argc == <span class="number">2</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            Udpserver <span class="built_in">server</span>(<span class="built_in">atoi</span>(argv[<span class="number">1</span>]));</span><br><span class="line">            server.<span class="built_in">loop</span>();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// ./server port ip</span></span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">        &#123;</span><br><span class="line">            Udpserver <span class="built_in">server</span>(<span class="built_in">atoi</span>(argv[<span class="number">1</span>]), argv[<span class="number">2</span>]);</span><br><span class="line">            server.<span class="built_in">loop</span>();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<p><strong>初始化锁：</strong></p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">int pthread_mutex_init(pthread_mutex_t *restrict mutex,</span><br><span class="line">       				   const pthread_mutexattr_t *restrict attr)</span><br><span class="line">pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;</span><br></pre></td></tr></table></figure>
+<p><strong>客户端：</strong></p>
+<figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> BUF_SIZE 1024</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Udpclient</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Udpclient</span>(std::<span class="type">uint16_t</span> port, std::string ip)</span><br><span class="line">        : <span class="built_in">ip_</span>(ip), <span class="built_in">port_</span>(port), <span class="built_in">sockfd_</span>(<span class="number">-1</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        sockfd_ = <span class="built_in">socket</span>(AF_INET, SOCK_DGRAM, <span class="number">0</span>);</span><br><span class="line">        <span class="keyword">if</span> (sockfd_ &lt; <span class="number">0</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="built_in">log</span>(FATAL, <span class="string">&quot;create client socket err&quot;</span>);</span><br><span class="line">            <span class="built_in">exit</span>(<span class="number">-1</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// client不需要手动bind，操作系统会自动bind</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">start</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">struct</span> <span class="title class_">sockaddr_in</span> local;</span><br><span class="line">        <span class="built_in">bzero</span>(&amp;local,<span class="built_in">sizeof</span>(local));</span><br><span class="line">        local.sin_addr.s_addr = <span class="built_in">inet_addr</span>(ip_.<span class="built_in">c_str</span>());</span><br><span class="line">        local.sin_family = AF_INET;</span><br><span class="line">        local.sin_port = port_;</span><br><span class="line">        <span class="keyword">while</span> (<span class="literal">true</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            std::cout&lt;&lt;<span class="string">&quot;Enter# &quot;</span>;</span><br><span class="line">            std::string buffer;</span><br><span class="line">            <span class="built_in">getline</span>(std::cin,buffer);</span><br><span class="line">            <span class="built_in">sendto</span>(sockfd_, buffer.<span class="built_in">c_str</span>(), buffer.<span class="built_in">size</span>(), <span class="number">0</span>, (<span class="type">const</span> <span class="keyword">struct</span> sockaddr *)&amp;local, <span class="built_in">sizeof</span>(local));</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    std::string ip_;</span><br><span class="line">    std::<span class="type">uint16_t</span> port_;</span><br><span class="line">    <span class="type">int</span> sockfd_;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">(<span class="type">int</span> argc,<span class="type">char</span> *argv[])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span>(argc == <span class="number">3</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="function">Udpclient <span class="title">client</span><span class="params">(atoi(argv[<span class="number">1</span>]),argv[<span class="number">2</span>])</span></span>;</span><br><span class="line">        client.<span class="built_in">start</span>();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span>&#123;</span><br><span class="line">        <span class="built_in">log</span>(FATAL,<span class="string">&quot;Usage:[%s port ip]&quot;</span>,argv[<span class="number">0</span>]);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<p>pthread库提供了两种初始化锁的方式：</p>
-<ul>
-<li>通过init接口，第二个参数可以设置锁的属性</li>
-<li>通过宏 PTHREAD_MUTEX_INITIALIZER只能创建用于静态内存的锁，即在定义时直接声明的变量</li>
-</ul>
-<p><strong>加锁：</strong></p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">pthread_mutex_lock</span><span class="params">(<span class="type">pthread_mutex_t</span> *mutex)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_mutex_trylock</span><span class="params">(<span class="type">pthread_mutex_t</span> *mutex)</span>;</span><br></pre></td></tr></table></figure>
-
-<p>pthread库提供了两种加锁方式：</p>
-<ul>
-<li>lock是阻塞式加锁</li>
-<li>unlock是非阻塞式加锁</li>
-</ul>
-<p><strong>解锁：</strong></p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">int pthread_mutex_unlock(pthread_mutex_t *mutex);</span><br></pre></td></tr></table></figure>
-
-<p><strong>释放锁：</strong></p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">pthread_mutex_destroy</span><span class="params">(<span class="type">pthread_mutex_t</span> *mutex)</span>;</span><br></pre></td></tr></table></figure>
-
-<p>以下是不加锁情况下多线程访问临界资源的简单实例：</p>
-<figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> count = <span class="number">10000</span>; <span class="comment">// 临界区资源</span></span><br><span class="line"><span class="function"><span class="type">void</span> *<span class="title">run</span><span class="params">(<span class="type">void</span> *args)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span> (<span class="literal">true</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span> (count &gt; <span class="number">0</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            std::cout &lt;&lt;<span class="string">&quot;tid：&quot;</span>&lt;&lt;<span class="built_in">syscall</span>(SYS_gettid) &lt;&lt; <span class="string">&quot; count: &quot;</span> &lt;&lt; --count &lt;&lt; std::endl;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="type">pthread_t</span> threads[<span class="number">3</span>];</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">3</span>; i++)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">pthread_create</span>(&amp;threads[i], <span class="literal">nullptr</span>, run, <span class="literal">nullptr</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">3</span>; i++)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">pthread_join</span>(threads[i], <span class="literal">nullptr</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>这段代码中，创建了3个线程去并发执行run函数，count是临界区资源，三个线程都可以访问修改count。</p>
-<p>执行结果：</p>
-<p><img src="http://lemon-pi.oss-cn-beijing.aliyuncs.com/img/1.png"></p>
-<p><img src="http://lemon-pi.oss-cn-beijing.aliyuncs.com/img/1.1.png"></p>
-<p>出现了各种输出错误和数据不一致，这是多线程访问临界资源导致的冲突情况。</p>
-<p>以下是加锁以后的代码：</p>
-<figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> count = <span class="number">1000</span>; <span class="comment">// 临界区资源</span></span><br><span class="line"><span class="type">pthread_mutex_t</span> mutex = PTHREAD_MUTEX_INITIALIZER;</span><br><span class="line"><span class="function"><span class="type">void</span> *<span class="title">run</span><span class="params">(<span class="type">void</span> *args)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span> (<span class="literal">true</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">pthread_mutex_lock</span>(&amp;mutex);</span><br><span class="line">        <span class="keyword">if</span> (count &gt; <span class="number">0</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="built_in">usleep</span>(<span class="number">200</span>);</span><br><span class="line">            std::cout &lt;&lt;<span class="string">&quot;tid：&quot;</span>&lt;&lt;<span class="built_in">syscall</span>(SYS_gettid) &lt;&lt; <span class="string">&quot; count: &quot;</span> &lt;&lt; --count &lt;&lt; std::endl;</span><br><span class="line">            <span class="built_in">pthread_mutex_unlock</span>(&amp;mutex);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">        &#123;</span><br><span class="line">            <span class="built_in">pthread_mutex_unlock</span>(&amp;mutex);</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">// pthread_mutex_init(&amp;mutex,nullptr);</span></span><br><span class="line">    <span class="type">pthread_t</span> threads[<span class="number">3</span>];</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">3</span>; i++)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">pthread_create</span>(&amp;threads[i], <span class="literal">nullptr</span>, run, <span class="literal">nullptr</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">3</span>; i++)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">pthread_join</span>(threads[i], <span class="literal">nullptr</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">pthread_mutex_destroy</span>(&amp;mutex);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>执行结果：</p>
-<p><img src="http://lemon-pi.oss-cn-beijing.aliyuncs.com/img/2.png"></p>
-<p>通过加锁解决了多线程访问临界资源冲突的问题。但是通过tid可以看出，整个进程生命周期里，<strong>几乎只有单个线程在执行任务</strong>，并不是我们预期设想的多个线程并发执行任务。</p>
-<p>产生这种现象的原因：该线程执行任务的消耗小于CPU切换到其他线程的消耗，所以CPU调度机制会保持该线程运行下去，不会切换线程。这样就会导致其他线程创建出来却没有执行任务，反而浪费了系统的资源，为了解决这个问题，我们引入了<strong>线程同步</strong>。</p>
-<h2 id="4-线程同步"><a href="#4-线程同步" class="headerlink" title="4. 线程同步"></a>4. 线程同步</h2><p>当我们对多线程互斥访问同一份资源不作限制时，完全由CPU去进行调度，就有可能会出现上面的线程饥饿现象，导致资源的浪费，因此我们引入了线程同步的概念，在保证线程访问安全的前提下，通过条件变量等机制去控制线程，使得多个线程能够按照一定的顺序、时间和方式执行。</p>
-<h4 id="4-1-条件变量"><a href="#4-1-条件变量" class="headerlink" title="4.1 条件变量"></a>4.1 条件变量</h4><p>以下是pthread库提供的条件变量接口：</p>
-<p><strong>条件变量：</strong></p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">pthread_cond_t</span></span><br></pre></td></tr></table></figure>
-
-<p><strong>初始化：</strong></p>
-<p>类似于锁，pthread库提供了两种初始化条件变量方式：</p>
-<ul>
-<li>init接口，第二个参数可以设置条件变量属性</li>
-<li>通过宏 PTHREAD_COND_INITIALIZER只能创建用于静态内存的锁，即在定义时直接声明的变量</li>
-</ul>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">pthread_cond_init</span><span class="params">(<span class="type">pthread_cond_t</span> *<span class="keyword">restrict</span> cond,</span></span><br><span class="line"><span class="params">              <span class="type">const</span> <span class="type">pthread_condattr_t</span> *<span class="keyword">restrict</span> attr)</span>;</span><br><span class="line"><span class="type">pthread_cond_t</span> cond = PTHREAD_COND_INITIALIZER;              		  </span><br></pre></td></tr></table></figure>
-
-<p><strong>等待条件变量信号：</strong></p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">int pthread_cond_timedwait(pthread_cond_t *restrict cond,</span><br><span class="line">              pthread_mutex_t *restrict mutex,</span><br><span class="line">              const struct timespec *restrict abstime);</span><br><span class="line">int pthread_cond_wait(pthread_cond_t *restrict cond,</span><br><span class="line">              pthread_mutex_t *restrict mutex);</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>第一个参数为条件变量，第二个参数为锁，目的是<strong>保证条件变量读写的原子性</strong></li>
-<li>timedwait接口的多出的第三个参数可以设置等待的时间</li>
-</ul>
-<p><strong>!!! 注意，pthread库在wait和timewait内部做了类似下面的特殊处理：</strong></p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">pthread_cond_wait</span><span class="params">(<span class="type">pthread_cond_t</span> *<span class="keyword">restrict</span> cond,<span class="type">pthread_mutex_t</span> *<span class="keyword">restrict</span> mutex)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// 解锁</span></span><br><span class="line">   pthread_mutex_unlock(mutex);</span><br><span class="line">    <span class="comment">// 阻塞等待条件变量信号</span></span><br><span class="line">   	 ...</span><br><span class="line">    <span class="comment">// 收到条件变量信号，如果有锁资源，加锁，没有锁资源，阻塞等待加锁</span></span><br><span class="line">   pthread_mutex_lock(mutex);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>在进行条件变量信号等待时，会先进行解锁，阻塞等待条件变量信号，直到收到信号才会进行加锁。<strong>这样处理的目的是防止线程阻塞时占用锁资源，使得其他线程没法及时获得锁资源。</strong></p>
-<p>这种特殊处理会导致使用条件变量时出现下面的情况：</p>
-<p>收到条件变量信号的某个线程加锁后开始执行任务，其他线程的状态为阻塞等待条件变量信号或者阻塞等待锁资源，但假如拿到锁的线程退出后没有释放锁，就会导致其他线程一只阻塞等待阻塞等待加锁。</p>
-<p><strong>为了避免这种情况的发生，需要程序员在程执行完后手动释放锁资源。</strong></p>
-<p><strong>发送条件变量信号：</strong></p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">pthread_cond_broadcast</span><span class="params">(<span class="type">pthread_cond_t</span> *cond)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_cond_signal</span><span class="params">(<span class="type">pthread_cond_t</span> *cond)</span>;</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>第一个接口会向所有阻塞在cond条件变量下的线程发送信号</li>
-<li>第二个接口会向至少一个阻塞在cond条件变量下的线程发送信号</li>
-</ul>
-<h4 id="4-2-生产消费者模型–阻塞队列"><a href="#4-2-生产消费者模型–阻塞队列" class="headerlink" title="4.2 生产消费者模型–阻塞队列"></a>4.2 生产消费者模型–阻塞队列</h4><p>生产消费者是线程同步中常用的一个模型，它不仅能保证各种操作的原子性，还能实现访问控制。</p>
-<p>生产消费者模型结构：</p>
-<ul>
-<li>任务队列：存放待执行任务的队列，</li>
-<li>生产者：主线程向任务队列中添加任务并通知子线程</li>
-<li>消费者：子线程从任务队列中取出任务并通知主线程</li>
-</ul>
-<p>通过锁来保证生产者添加任务和消费者取出任务操作的原子性，通过条件变量来控制线程。</p>
-<p>下面是生产消费者模型的一个简单示例：</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TaskQueue</span>&#123;</span></span><br><span class="line">private:</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">queue</span>&lt;Task*&gt; queue_;</span><br><span class="line">    <span class="type">pthread_mutex_t</span> *mutex;</span><br><span class="line">    <span class="type">pthread_cond_t</span> *cond;</span><br><span class="line">    <span class="type">int</span> MaxNum;</span><br><span class="line">public:</span><br><span class="line">    TaskQueue(<span class="type">int</span> n)</span><br><span class="line">    :MaxNum(n)</span><br><span class="line">    &#123;</span><br><span class="line">        pthread_mutex_init(mutex,nullptr);</span><br><span class="line">        pthread_cond_init(cond,nullptr);</span><br><span class="line">    &#125;</span><br><span class="line">public:</span><br><span class="line">    <span class="type">void</span> <span class="title function_">push</span><span class="params">(Task *t)</span></span><br><span class="line">    &#123;</span><br><span class="line">        pthread_mutex_lock(mutex);</span><br><span class="line">        <span class="keyword">if</span>(queue_.size()&gt;= MaxNum)</span><br><span class="line">        &#123;</span><br><span class="line">            pthread_cond_wait(cond,mutex);</span><br><span class="line">        &#125;</span><br><span class="line">        queue_.push(t);</span><br><span class="line">        pthread_cond_signal(cond);</span><br><span class="line">        pthread_mutex_unlock(mutex);</span><br><span class="line">    &#125;</span><br><span class="line">    Task* <span class="title function_">pop</span><span class="params">()</span></span><br><span class="line">    &#123;</span><br><span class="line">        pthread_mutex_lock(mutex);</span><br><span class="line">        <span class="keyword">if</span>(queue_.size()== <span class="number">0</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            pthread_cond_wait(cond,mutex);</span><br><span class="line">        &#125;</span><br><span class="line">        Task *t = queue_.front();</span><br><span class="line">        queue_.pop();</span><br><span class="line">        pthread_cond_signal(cond);</span><br><span class="line">        pthread_mutex_unlock(mutex);</span><br><span class="line">        <span class="keyword">return</span> t;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-
-
-
-<h2 id="5-线程池"><a href="#5-线程池" class="headerlink" title="5.线程池"></a>5.线程池</h2><p>线程池是通过<strong>池化技术</strong>实现的一种管理线程的技术栈，通过线程池技术，我们可以将线程的创建和任务的执行解耦开来，从而实现<strong>降低资源消耗</strong>、<strong>提高响应速度</strong> 、<strong>方便线程管理</strong>。</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Threadpool</span>&#123;</span></span><br><span class="line">private:</span><br><span class="line">    Threadpool(<span class="type">int</span> threadNum)</span><br><span class="line">    :threadNum_(threadNum)</span><br><span class="line">    &#123;&#125;</span><br><span class="line">    Threadpool(<span class="type">const</span> Threadpool &amp;)=delete;</span><br><span class="line">    Threadpool &amp; operator =(<span class="type">const</span> Threadpool &amp;)=delete;</span><br><span class="line">    ~Threadpool();</span><br><span class="line">public:</span><br><span class="line">    <span class="comment">// 获得线程池单例</span></span><br><span class="line">    <span class="type">static</span> Threadpool* <span class="title function_">GetInstance</span><span class="params">(<span class="type">int</span> threadNum)</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">// Double Check Lock</span></span><br><span class="line">        <span class="keyword">if</span>(instance == nullptr)</span><br><span class="line">        &#123;</span><br><span class="line">            pthread_mutex_lock(&amp;Mutex);</span><br><span class="line">            <span class="keyword">if</span>(instance ==nullptr)</span><br><span class="line">            &#123;</span><br><span class="line">                instance = new Threadpool(threadNum);</span><br><span class="line">            &#125;</span><br><span class="line">            pthread_mutex_unlock(&amp;Mutex);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> instance;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 添加任务到任务队列</span></span><br><span class="line">    <span class="type">void</span> <span class="title function_">addTask</span><span class="params">(<span class="type">void</span>(*)(<span class="type">void</span>*),<span class="type">void</span> *args)</span>;</span><br><span class="line">    <span class="comment">// 添加空任务到任务队列</span></span><br><span class="line">    <span class="type">void</span> <span class="title function_">joinAll</span><span class="params">()</span>;</span><br><span class="line">private:</span><br><span class="line">    <span class="type">static</span> <span class="type">void</span>* <span class="title function_">run</span><span class="params">(<span class="type">void</span> *args)</span>;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">Task</span>&#123;</span></span><br><span class="line">        Task(<span class="type">void</span> (*func)(<span class="type">void</span>*),<span class="type">void</span> *args)</span><br><span class="line">        :args_(args)</span><br><span class="line">        ,func_(func)</span><br><span class="line">        &#123;&#125;</span><br><span class="line"></span><br><span class="line">        <span class="type">void</span> *args_;<span class="comment">// 参数</span></span><br><span class="line">        <span class="type">void</span> (*func_)(<span class="type">void</span> *); <span class="comment">// 任务函数指针</span></span><br><span class="line">    &#125;;</span><br><span class="line">    <span class="type">static</span> Threadpool * instance;</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">queue</span>&lt;Task*&gt; Taskqueue;<span class="comment">// 任务队列</span></span><br><span class="line">    <span class="type">pthread_mutex_t</span> queueMutex;<span class="comment">// 锁</span></span><br><span class="line">    <span class="type">static</span> <span class="type">pthread_mutex_t</span> Mutex; <span class="comment">// 单例锁</span></span><br><span class="line">    <span class="type">pthread_cond_t</span> queueCond;<span class="comment">// 条件变量</span></span><br><span class="line">    <span class="type">pthread_t</span> * threads; </span><br><span class="line">    <span class="type">int</span> threadNum_;<span class="comment">// 线程数量</span></span><br><span class="line">    <span class="type">bool</span> stop;</span><br><span class="line">&#125;;</span><br><span class="line">Threadpool * Threadpool::instance =nullptr;</span><br><span class="line"><span class="type">pthread_mutex_t</span> Threadpool::Mutex;</span><br><span class="line"></span><br><span class="line">Threadpool::~Threadpool()</span><br><span class="line">&#123;</span><br><span class="line">    stop = <span class="literal">true</span>;</span><br><span class="line">    <span class="comment">// 唤醒所有线程</span></span><br><span class="line">    pthread_cond_broadcast(&amp;queueCond);</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">0</span>;i&lt;threadNum_;i++)</span><br><span class="line">    &#123;</span><br><span class="line">        pthread_join(threads[i],nullptr);</span><br><span class="line">    &#125;</span><br><span class="line">    delete [] threads;</span><br><span class="line">    pthread_mutex_destroy(&amp;queueMutex);</span><br><span class="line">    pthread_cond_destroy(&amp;queueCond);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> * <span class="title function_">Threadpool::run</span><span class="params">(<span class="type">void</span> *args)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">while</span>(<span class="literal">true</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        pthread_mutex_lock(&amp;instance-&gt;queueMutex);</span><br><span class="line">        <span class="keyword">while</span>(instance-&gt;Taskqueue.empty() &amp;&amp; !instance-&gt;stop)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="comment">// 等待线程被唤醒</span></span><br><span class="line">            pthread_cond_wait(&amp;instance-&gt;queueCond,&amp;instance-&gt;queueMutex);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span>(instance-&gt;stop)</span><br><span class="line">        &#123;</span><br><span class="line">            pthread_mutex_unlock(&amp;instance-&gt;queueMutex);</span><br><span class="line">            pthread_exit(nullptr);</span><br><span class="line">        &#125;</span><br><span class="line">        Task * task = instance-&gt;Taskqueue.front();</span><br><span class="line">        instance-&gt;Taskqueue.pop();</span><br><span class="line">        pthread_mutex_unlock(&amp;instance-&gt;queueMutex);</span><br><span class="line">        <span class="keyword">if</span>(task)</span><br><span class="line">        &#123;</span><br><span class="line">            task-&gt;func_(task-&gt;args_);</span><br><span class="line">            delete task;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> nullptr;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">Threadpool::addTask</span><span class="params">(<span class="type">void</span> (*func)(<span class="type">void</span>*),<span class="type">void</span> *args)</span></span><br><span class="line">&#123;</span><br><span class="line">    Task *task= new Task(func,args);</span><br><span class="line">    pthread_mutex_lock(&amp;queueMutex);</span><br><span class="line">    Taskqueue.push(task);</span><br><span class="line">    <span class="comment">// 通知消费者消费</span></span><br><span class="line">    pthread_cond_signal(&amp;queueCond);</span><br><span class="line">    pthread_mutex_unlock(&amp;queueMutex);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 向队列添加空任务</span></span><br><span class="line"><span class="type">void</span> Threadpool:: joinAll()</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">0</span>;i&lt;threadNum_;i++)</span><br><span class="line">    &#123;</span><br><span class="line">        addTask(nullptr,nullptr);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Threadpool::Threadpool(<span class="type">int</span> threadNum)</span><br><span class="line">&#123;</span><br><span class="line">    this-&gt;threadNum_ = threadNum;</span><br><span class="line">    pthread_mutex_init(&amp;queueMutex,<span class="literal">NULL</span>);</span><br><span class="line">    pthread_cond_init(&amp;queueCond,<span class="literal">NULL</span>);</span><br><span class="line">    threads = new <span class="type">pthread_t</span>[threadNum];</span><br><span class="line">    stop = <span class="literal">false</span>;</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">0</span>;i&lt;threadNum;i++)</span><br><span class="line">    &#123;</span><br><span class="line">        pthread_create(&amp;threads[i],<span class="literal">NULL</span>,run,this);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-]]></content>
+<p>以下是运行截图：</p>
+<p><img src="http://lemon-pi.oss-cn-beijing.aliyuncs.com/img/4.9.png"></p>
+<h4 id="3-2-TcpSocket"><a href="#3-2-TcpSocket" class="headerlink" title="3.2 TcpSocket"></a>3.2 TcpSocket</h4>]]></content>
       <categories>
         <category>Linux</category>
       </categories>
@@ -594,6 +507,276 @@
 
 <p>执行结果：</p>
 <p><img src="http://lemon-pi.oss-cn-beijing.aliyuncs.com/img/4.2.png"></p>
+]]></content>
+      <categories>
+        <category>Linux</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>Linux下多线程编程及pthread库的使用</title>
+    <url>/2023/04/26/%E7%BA%BF%E7%A8%8B/</url>
+    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="\assets\css\APlayer.min.css"><script src="\assets\js\APlayer.min.js" class="aplayer-secondary-script-marker"></script><h2 id="1-Linux下的线程"><a href="#1-Linux下的线程" class="headerlink" title="1. Linux下的线程"></a>1. Linux下的线程</h2><h4 id="1-1-Linux下线程与进程的关系"><a href="#1-1-Linux下线程与进程的关系" class="headerlink" title="1.1 Linux下线程与进程的关系"></a>1.1 Linux下线程与进程的关系</h4><ul>
+<li><p><strong>进程是操作系统分配资源的基本单位</strong></p>
+</li>
+<li><p><strong>线程是操作系统任务调度的基本单位</strong></p>
+</li>
+<li><p><strong>Linux内核中的线程可以看作是轻量级进程</strong></p>
+</li>
+<li><p><strong>进程具有独立性，线程不具有独立性</strong></p>
+<p>我们知道，Linux内核在创建<strong>进程</strong>时：</p>
+<ol>
+<li>创建并初始化<strong>进程控制块 PCB（Process Control Block）</strong>：它记录了进程的状态、标识符、优先级等。</li>
+<li>为进程分配独立的虚拟进程地址空间，将程序、数据、库文件载入虚拟地址空间中。</li>
+<li>复制父进程的内存空间：因为Linux采取了<strong>写时拷贝COW（Copy-On-Write）</strong>的技术，该进程的内存页表是父进程内存页表的一份拷贝，只有子进程需要修改其中某个内存页时，子进程的内存页表才会重新建立内存页表到物理空间的映射</li>
+<li>复制父进程的文件描述符表</li>
+<li>复制父进程的环境变量和命令行参数</li>
+<li>复制父进程的信号处理器</li>
+</ol>
+<p>而Linux内核在创建<strong>线程</strong>时：</p>
+<p>  1.初始化线程控制块（Thread Control Block，TCB）</p>
+<p>  2.设置线程的堆栈、寄存器</p>
+<p>  3.设置线程的调度属性</p>
+<p>  4.加入到进程的线程组中，这些线程共享进程的部分资源</p>
+<p>这些创建出来的线程不创建地址空间，而是<strong>共享进程的地址空间和其他资源</strong>（文件描述符，信号处理器等），其创建的开销远小于进程，所以我们说Linux下线程可以看作是轻量级进程。</p>
+<p>进程拥有自己独立的进程地址空间，进程具有独立性，而线程共享进程的地址空间，所有线程不具有独立性。线程除了共享进程地址空间，也拥有自己的私有成员：线程标识符、线程栈、线程寄存器</p>
+<p><strong>线程栈和线程寄存器是线程的两个重要组成部分：</strong></p>
+<ul>
+<li>线程栈是一个特殊的内存区域，用于存储线程执行时的函数调用栈、局部变量、函数参数等数据。每个线程都有自己的线程栈，线程栈的大小在创建线程时可以指定。线程在执行过程中，会不断地向线程栈中压入和弹出函数调用的相关信息，从而实现程序的正常执行。</li>
+<li>线程寄存器是CPU中的一组特殊寄存器，用于存储线程执行时的上下文信息，包括程序计数器、栈指针、通用寄存器等。线程在执行过程中，需要不断地保存和恢复这些寄存器的值，以便在线程切换时保持线程的执行状态。</li>
+</ul>
+<p>在Linux系统中，线程栈和线程寄存器是由内核进行管理和调度的。线程栈和线程寄存器的分配和初始化工作是由内核在创建线程时完成的，当线程被切换时，内核会将线程栈和线程寄存器中的内容保存下来，然后切换到其他线程的执行上下文。因此，线程栈和线程寄存器的正确使用和管理对于线程的正常运行至关重要。</p>
+</li>
+</ul>
+<h4 id="1-2-Linux下线程的种类"><a href="#1-2-Linux下线程的种类" class="headerlink" title="1.2  Linux下线程的种类"></a>1.2  Linux下线程的种类</h4><ol>
+<li>用户级线程（User-Level Thread，ULT）：这种线程是由用户空间的线程库（<strong>如 pthread库</strong>）实现的，线程的创建、调度、同步等都由线程库管理。内核对用户级线程是没有感知的，因此它们的调度和同步都是由用户空间的线程库完成的。由于用户级线程不需要进入内核空间，因此它们的切换比内核级线程快，但是它们无法利用多处理器。</li>
+<li>内核级线程（Kernel-Level Thread，KLT）：这种线程由内核创建和管理，它们的调度和同步都是由内核完成的。内核级线程可以利用多处理器，但是它们的切换比用户级线程慢。Linux 中的内核级线程是使用轻量级进程实现的，每个进程都可以拥有多个轻量级进程，也就是说，一个进程可以拥有多个内核级线程。</li>
+</ol>
+<h2 id="2-pthread库的使用"><a href="#2-pthread库的使用" class="headerlink" title="2. pthread库的使用"></a>2. pthread库的使用</h2><p>pthread是官方提供的用户级的线程库，我们口中所指的线程大多就是指phread库为我们提供的用户级线程。</p>
+<h4 id="2-1-头文件"><a href="#2-1-头文件" class="headerlink" title="2.1 头文件"></a>2.1 头文件</h4><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;pthread.h&gt;</span> <span class="comment">// 头文件 Linux系统默认带pthread库</span></span></span><br></pre></td></tr></table></figure>
+
+<p>pthread不属于标准库，编译时需要带上 -lpthread</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line">g++ test.cc -o test -lpthread</span><br></pre></td></tr></table></figure>
+
+<h4 id="2-2-pthread-create"><a href="#2-2-pthread-create" class="headerlink" title="2.2 pthread_create"></a>2.2 pthread_create</h4><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">pthread_create</span><span class="params">(<span class="type">pthread_t</span> *thread, <span class="type">const</span> <span class="type">pthread_attr_t</span> *attr,</span></span><br><span class="line"><span class="params">  <span class="type">void</span> *(*start_routine) (<span class="type">void</span> *), <span class="type">void</span> *arg)</span>;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>DESCRIPTION</p>
+<p>​	   The  pthread_create()  function  starts  a new thread in the calling process</p>
+</blockquote>
+<p>这个接口会在当前进程中创建出一个用户级线程</p>
+<ul>
+<li>第一个参数是线程的id</li>
+<li>第二个参数是线程的属性，一般设置为nullptr</li>
+<li>第三个参数是函数指针，这个函数的返回值是void*  ，参数为void* ，创建出来的线程会去执行这个函数</li>
+<li>第四个参数是start_routine函数传给线程的参数</li>
+</ul>
+<blockquote>
+<p>RETURN VALUE<br>       On success, pthread_create() returns 0; on error, it returns an error number, and the contents of *thread are undefined.</p>
+</blockquote>
+<p>创建成功时，返回值为0，创建失败返回错误码。</p>
+<h4 id="2-3-pthread-join"><a href="#2-3-pthread-join" class="headerlink" title="2.3 pthread_join"></a>2.3 pthread_join</h4><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">pthread_join</span><span class="params">(<span class="type">pthread_t</span> thread, <span class="type">void</span> **retval)</span>;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>DESCRIPTION<br>       The  pthread_join() function waits for the thread specified by thread to terminate.  If that thread has already terminated, then pthread_join() returns immediately.  </p>
+<p>​	   The thread specified by thread must be joinable.</p>
+</blockquote>
+<p>这个接口会一直阻塞等待目标线程执行完毕后回收资源，如果线程已经被回收，会直接返回。</p>
+<p>The thread specified by thread must be joinable. 意思是这个线程必须是joinable属性（创建线程时不指定属性的话默认是joinable）或者没有被显式的剥离（调用pthread_detach)。</p>
+<p>由于线程占用的资源不会在线程执行完时自己释放，所以需要其他线程执行pthread_join（或者同时调用pthread_detach和pthread_exit)来释放资源，否则就会导致资源的泄露。</p>
+<ul>
+<li>第一个参数是等待的线程id</li>
+<li>第二个参数可以接收等待的线程执行完毕后的返回值</li>
+</ul>
+<blockquote>
+<p>RETURN VALUE<br>       On success, pthread_join() returns 0; on error, it returns an error number.</p>
+</blockquote>
+<p>等待成功返回0，否则返回错误码</p>
+<p>以下是一个简单的线程创建和等待回收的示例</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">void</span>* <span class="title function_">run</span><span class="params">(<span class="type">void</span> *args)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">cout</span>&lt;&lt;<span class="string">&quot;run&quot;</span>&lt;&lt;<span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">pthread_t</span> t;</span><br><span class="line">    <span class="keyword">if</span>(pthread_create(&amp;t,nullptr,run,nullptr) != <span class="number">0</span> )</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">std</span>::<span class="built_in">cerr</span>&lt;&lt;<span class="string">&quot;pthread_create error\n&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 阻塞等待线程回收</span></span><br><span class="line">    <span class="keyword">if</span>(pthread_join(t,nullptr) == <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">std</span>::<span class="built_in">cout</span>&lt;&lt;<span class="string">&quot;pthread_join success\n&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125; </span><br></pre></td></tr></table></figure>
+
+<p>执行结果：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">[wyj@VM-20-8-centos ]$ g++ test.cc -o test -lpthread -std=c++11</span><br><span class="line">[wyj@VM-20-8-centos ]$ ./test</span><br><span class="line">run</span><br><span class="line">pthread_join success</span><br></pre></td></tr></table></figure>
+
+<h4 id="2-3-pthread-exit"><a href="#2-3-pthread-exit" class="headerlink" title="2.3 pthread_exit"></a>2.3 pthread_exit</h4><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">pthread_exit</span><span class="params">(<span class="type">void</span> *retval)</span>;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>DESCRIPTION<br>       The  pthread_exit()  function  terminates  the calling thread and returns a value via retval that (if the thread is joinable) is<br>       available to another thread in the same process that calls pthread_join</p>
+</blockquote>
+<p>这个接口可以终止运行的线程，进程中其他没有被剥离（调用pthread_detach)的线程可以通过pthread_join接收这个被终止线程的返回值</p>
+<ul>
+<li>参数retval的值可以被其他线程通过pthread_join获取</li>
+</ul>
+<p>Linux下线程结束执行有以下几种情况:</p>
+<ul>
+<li>线程将指定函数体中的代码执行完后自行结束；</li>
+<li>线程执行过程中，被同一进程中的其它线程（包括主线程）强制终止；</li>
+<li>线程执行过程中，遇到 pthread_exit() 函数结束执行。</li>
+</ul>
+<p>下面给出几个简单的使用示例：</p>
+<p><strong>通过pthread_exit退出线程</strong></p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">void</span> *<span class="title function_">run</span><span class="params">(<span class="type">void</span> *args)</span></span><br><span class="line">&#123;</span><br><span class="line">    pthread_exit(<span class="string">&quot;pthread_exit&quot;</span>);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;run\n&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">pthread_t</span> t;</span><br><span class="line">    <span class="keyword">if</span> (pthread_create(&amp;t, <span class="literal">NULL</span>, run, <span class="literal">NULL</span>) != <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;pthread_create error\n&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="type">void</span> *ret;</span><br><span class="line">    <span class="comment">// 阻塞等待线程回收</span></span><br><span class="line">    <span class="keyword">if</span> (pthread_join(t, &amp;ret) == <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">       <span class="built_in">printf</span>(<span class="string">&quot;pthread_join success\n&quot;</span>);</span><br><span class="line">       <span class="built_in">printf</span>(<span class="string">&quot;%s\n&quot;</span>,(<span class="type">char</span>*)ret);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>执行结果：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line">[wyj@VM<span class="number">-20</span><span class="number">-8</span>-centos]$ gcc test.c -o test -lpthread</span><br><span class="line">[wyj@VM<span class="number">-20</span><span class="number">-8</span>-centos]$ ./test</span><br><span class="line">pthread_join success</span><br><span class="line">pthread_exit</span><br></pre></td></tr></table></figure>
+
+<p>由结果可知，线程调用pthread_exit后提前退出，没有执行后面的printf(“run\n”)，主线程通过pthread_join获得退出值</p>
+<p><strong>强制退出线程</strong></p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">void</span> *<span class="title function_">run</span><span class="params">(<span class="type">void</span> *args)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;run\n&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">pthread_t</span> t;</span><br><span class="line">    <span class="keyword">if</span> (pthread_create(&amp;t, <span class="literal">NULL</span>, run, <span class="literal">NULL</span>) != <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;pthread_create error\n&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;main thread exit\n&quot;</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>执行结果：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">[wyj@VM-20-8-centos]$ gcc test.c -o test -lpthread</span><br><span class="line">[wyj@VM-20-8-centos]$ ./test</span><br><span class="line">main thread exit</span><br></pre></td></tr></table></figure>
+
+<p>由执行结果可知，创建出来的线程并没有执行run函数，这是因为本次运行，cpu的调度使得主线程先执行，而且主线程并没有调用pthread_join去阻塞等待子线程，当主线程执行return 0的时候会调用系统接口exit(), exit()会终止进程内的所有线程，所以子线程没有执行run函数就被强制退出了。</p>
+<p>如果我们用pthread_exit提前退出主线程，不执行return 0：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">void</span> *<span class="title function_">run</span><span class="params">(<span class="type">void</span> *args)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;run\n&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">pthread_t</span> t;</span><br><span class="line">    <span class="keyword">if</span> (pthread_create(&amp;t, <span class="literal">NULL</span>, run, <span class="literal">NULL</span>) != <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;pthread_create error\n&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    pthread_exit(<span class="literal">NULL</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>执行结果：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line">[wyj@VM<span class="number">-20</span><span class="number">-8</span>-centos]$ gcc test.c -o test -lpthread</span><br><span class="line">[wyj@VM<span class="number">-20</span><span class="number">-8</span>-centos]$ ./test</span><br><span class="line">run</span><br></pre></td></tr></table></figure>
+
+<p>由结果可知，主线程提前退出，没有执行return 0，子线程执行了run函数。pthread_exit退出当前线程，不会影响其他线程。</p>
+<p><strong>此外，pthread_exit() 可以自动调用线程清理程序（本质是一个由 pthread_cleanup_push() 指定的自定义函数），return 则不具备这个能力。总之在实际场景中，如果想终止某个子线程执行，强烈建议大家使用 pthread_exit() 函数。</strong></p>
+<h4 id="2-4-pthread-detach"><a href="#2-4-pthread-detach" class="headerlink" title="2.4 pthread_detach"></a>2.4 pthread_detach</h4><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">pthread_detach</span><span class="params">(<span class="type">pthread_t</span> thread)</span>;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>DESCRIPTION<br>       The  pthread_detach()  function  marks  the  thread  identified  by  thread as detached.  When a detached thread terminates, its<br>       resources are automatically released back to the system without the need for another thread to join with the terminated thread.</p>
+</blockquote>
+<p>这个接口会将线程的状态设置为detached，当这个线程执行结束时，资源会被操作系统自动回收，不需要使用者手动调用pthread_join来回收。</p>
+<ul>
+<li>参数为线程的id</li>
+</ul>
+<p>我们知道，如果一个线程执行结束但还没有被join时，他的状态类似与进程中的僵尸进程（Zombie Process），需要创建线程的人手动调用pthread_join阻塞回收资源。</p>
+<p>但有时我们并不想阻塞等待，导致效率降低，同时为了避免资源泄露，就可以使用pthread_detach，让操作系统替我们管理线程。</p>
+<p>通常，在剥离子线程时，我们会让主线程保持在后台运行（常驻内存的程序），从而避免主线程退出，操作系统就自动回收被剥离的子线程，从而避免子线程还未执行完就退出的问题。</p>
+<h4 id="2-5-gettid"><a href="#2-5-gettid" class="headerlink" title="2.5 gettid"></a>2.5 gettid</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">pid_t gettid(void);</span><br></pre></td></tr></table></figure>
+
+<p>头文件：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/types.h&gt;</span></span></span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>DESCRIPTION<br>       gettid()  returns the caller’s thread ID (TID).  In a single-threaded process, the thread ID is equal to the process ID (PID, as<br>       returned by getpid().  In a multithreaded process, all threads have the same PID, but each one has a unique TID.</p>
+</blockquote>
+<p>gettid可以获取当前线程的线程tid，当进程内只有一个线程的时候，线程的tid等于进程的pid</p>
+<p><strong>gettid是系统接口，需要通过syscall来调用</strong></p>
+<h4 id="2-6-syscall"><a href="#2-6-syscall" class="headerlink" title="2.6 syscall"></a>2.6 syscall</h4><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">syscall</span><span class="params">(<span class="type">int</span> number, ...)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>头文件：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/syscall.h&gt;</span>   <span class="comment">/* For SYS_xxx definitions */</span></span></span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>syscall()  is  a  small library function that invokes the system call whose assembly language interface has the specified number with the specified arguments.  Employing syscall() is useful, for example, when invoking a system call that has no wrapper function in the C library.</p>
+<p>syscall() saves CPU registers before making the system call, restores the registers upon return from the system call, and stores any error code returned by the system call in errno if an error occurs.</p>
+</blockquote>
+<p>sycall()是一个小型库函数，它调用系统调用，其汇编语言接口具有指定编号和指定参数。例如，当调用C库中没有包装器函数的系统调用时，使用sycall()是有用的。</p>
+<p>syscall()在进行系统调用之前保存CPU寄存器，在系统调用返回时恢复寄存器，并存储error中的错误码</p>
+<p>以下是一个简单示例：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/syscall.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/types.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> *argv[])</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">pid_t</span> tid;</span><br><span class="line"></span><br><span class="line">    tid = syscall(SYS_gettid);</span><br><span class="line">    tid = syscall(SYS_tgkill, getpid(), tid);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="3-线程互斥"><a href="#3-线程互斥" class="headerlink" title="3.线程互斥"></a>3.线程互斥</h2><h4 id="3-1-基本概念"><a href="#3-1-基本概念" class="headerlink" title="3.1 基本概念"></a>3.1 基本概念</h4><p>线程互斥是指在多个线程中，对同一临界资源的访问进行限制，保证同一时间只有一个线程能够访问该资源，以避免多个线程同时修改同一个资源而导致的数据不一致问题。</p>
+<h4 id="3-2-临界资源"><a href="#3-2-临界资源" class="headerlink" title="3.2 临界资源"></a>3.2 临界资源</h4><p>临界资源是指共享的一段代码、一组数据或一块内存区域等，他们能被多个线程访问、修改，所以需要通过互斥访问来保证数据一致性的资源。比如，在一个多线程程序中，多个线程可能同时访问同一份数据结构，这时就需要使用临界资源的互斥访问来保证数据的正确性。</p>
+<h4 id="3-3-锁"><a href="#3-3-锁" class="headerlink" title="3.3 锁"></a>3.3 锁</h4><p><strong>锁是一种解决多线程访问临界资源的冲突一种技术。</strong>锁的实现依赖于操作系统的调度和底层硬件的原子性操作。</p>
+<h4 id="3-4-pthread-mutex"><a href="#3-4-pthread-mutex" class="headerlink" title="3.4 pthread_mutex"></a>3.4 pthread_mutex</h4><p>pthread_mutex是pthread库中实现的互斥锁，他的实现依赖于futex（fast userspace mutex）系统调用，它是一个基于用户空间和内核空间的协同机制，主要作用是将用户空间的线程挂起等待某个事件发生，并在事件发生时唤醒他们。futex底层实现中涉及到CPU提供的原子操作.</p>
+<p>当一个线程想要加锁时，它会首先尝试在用户空间中使用原子操作（如CAS）来获取锁，如果获取成功，则直接返回；否则，线程会调用futex_wait函数挂起自己，并在内核中等待锁的释放。当锁被持有线程释放时，它会调用futex_wake函数唤醒等待的线程，使它们重新竞争锁。在这个过程中，操作系统内核会对锁进行一些状态的维护，例如是否有线程正在等待锁、锁的拥有者等等。</p>
+<p>以下是X86架构CPU加锁过程汇编指令的简单示例：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">lock:</span><br><span class="line">    mov eax, 1   ; 将eax寄存器设置为1</span><br><span class="line">    xchg eax, [lock] ; 将eax寄存器中的值与lock变量中的值进行交换，lock变量中的值变为1</span><br><span class="line">    test eax, eax   ; 测试eax寄存器的值是否为0，为0则代表有锁资源</span><br><span class="line">    jnz lock    ; 如果eax寄存器的值不为0，跳转到lock标签处，继续尝试获取锁</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>lock初始化值为0,0代表有锁资源，1代表无锁资源</li>
+<li>在单处理机中，一次只有一个线程能上处理机执行xchg指令，是原子性操作</li>
+<li>实际的锁实现会更加复杂，涉及到缓存一致性、总线锁定等底层细节。</li>
+</ul>
+<p>以下是pthread库提供的关于锁操作的接口：</p>
+<p><strong>锁变量：</strong></p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">pthread_mutex_t</span> </span><br></pre></td></tr></table></figure>
+
+<p><strong>初始化锁：</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">int pthread_mutex_init(pthread_mutex_t *restrict mutex,</span><br><span class="line">       				   const pthread_mutexattr_t *restrict attr)</span><br><span class="line">pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;</span><br></pre></td></tr></table></figure>
+
+<p>pthread库提供了两种初始化锁的方式：</p>
+<ul>
+<li>通过init接口，第二个参数可以设置锁的属性</li>
+<li>通过宏 PTHREAD_MUTEX_INITIALIZER只能创建用于静态内存的锁，即在定义时直接声明的变量</li>
+</ul>
+<p><strong>加锁：</strong></p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">pthread_mutex_lock</span><span class="params">(<span class="type">pthread_mutex_t</span> *mutex)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_mutex_trylock</span><span class="params">(<span class="type">pthread_mutex_t</span> *mutex)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>pthread库提供了两种加锁方式：</p>
+<ul>
+<li>lock是阻塞式加锁</li>
+<li>unlock是非阻塞式加锁</li>
+</ul>
+<p><strong>解锁：</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">int pthread_mutex_unlock(pthread_mutex_t *mutex);</span><br></pre></td></tr></table></figure>
+
+<p><strong>释放锁：</strong></p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">pthread_mutex_destroy</span><span class="params">(<span class="type">pthread_mutex_t</span> *mutex)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>以下是不加锁情况下多线程访问临界资源的简单实例：</p>
+<figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> count = <span class="number">10000</span>; <span class="comment">// 临界区资源</span></span><br><span class="line"><span class="function"><span class="type">void</span> *<span class="title">run</span><span class="params">(<span class="type">void</span> *args)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span> (<span class="literal">true</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span> (count &gt; <span class="number">0</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            std::cout &lt;&lt;<span class="string">&quot;tid：&quot;</span>&lt;&lt;<span class="built_in">syscall</span>(SYS_gettid) &lt;&lt; <span class="string">&quot; count: &quot;</span> &lt;&lt; --count &lt;&lt; std::endl;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="type">pthread_t</span> threads[<span class="number">3</span>];</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">3</span>; i++)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">pthread_create</span>(&amp;threads[i], <span class="literal">nullptr</span>, run, <span class="literal">nullptr</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">3</span>; i++)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">pthread_join</span>(threads[i], <span class="literal">nullptr</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这段代码中，创建了3个线程去并发执行run函数，count是临界区资源，三个线程都可以访问修改count。</p>
+<p>执行结果：</p>
+<p><img src="http://lemon-pi.oss-cn-beijing.aliyuncs.com/img/1.png"></p>
+<p><img src="http://lemon-pi.oss-cn-beijing.aliyuncs.com/img/1.1.png"></p>
+<p>出现了各种输出错误和数据不一致，这是多线程访问临界资源导致的冲突情况。</p>
+<p>以下是加锁以后的代码：</p>
+<figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> count = <span class="number">1000</span>; <span class="comment">// 临界区资源</span></span><br><span class="line"><span class="type">pthread_mutex_t</span> mutex = PTHREAD_MUTEX_INITIALIZER;</span><br><span class="line"><span class="function"><span class="type">void</span> *<span class="title">run</span><span class="params">(<span class="type">void</span> *args)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span> (<span class="literal">true</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">pthread_mutex_lock</span>(&amp;mutex);</span><br><span class="line">        <span class="keyword">if</span> (count &gt; <span class="number">0</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="built_in">usleep</span>(<span class="number">200</span>);</span><br><span class="line">            std::cout &lt;&lt;<span class="string">&quot;tid：&quot;</span>&lt;&lt;<span class="built_in">syscall</span>(SYS_gettid) &lt;&lt; <span class="string">&quot; count: &quot;</span> &lt;&lt; --count &lt;&lt; std::endl;</span><br><span class="line">            <span class="built_in">pthread_mutex_unlock</span>(&amp;mutex);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">        &#123;</span><br><span class="line">            <span class="built_in">pthread_mutex_unlock</span>(&amp;mutex);</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">// pthread_mutex_init(&amp;mutex,nullptr);</span></span><br><span class="line">    <span class="type">pthread_t</span> threads[<span class="number">3</span>];</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">3</span>; i++)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">pthread_create</span>(&amp;threads[i], <span class="literal">nullptr</span>, run, <span class="literal">nullptr</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">3</span>; i++)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">pthread_join</span>(threads[i], <span class="literal">nullptr</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">pthread_mutex_destroy</span>(&amp;mutex);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>执行结果：</p>
+<p><img src="http://lemon-pi.oss-cn-beijing.aliyuncs.com/img/2.png"></p>
+<p>通过加锁解决了多线程访问临界资源冲突的问题。但是通过tid可以看出，整个进程生命周期里，<strong>几乎只有单个线程在执行任务</strong>，并不是我们预期设想的多个线程并发执行任务。</p>
+<p>产生这种现象的原因：该线程执行任务的消耗小于CPU切换到其他线程的消耗，所以CPU调度机制会保持该线程运行下去，不会切换线程。这样就会导致其他线程创建出来却没有执行任务，反而浪费了系统的资源，为了解决这个问题，我们引入了<strong>线程同步</strong>。</p>
+<h2 id="4-线程同步"><a href="#4-线程同步" class="headerlink" title="4. 线程同步"></a>4. 线程同步</h2><p>当我们对多线程互斥访问同一份资源不作限制时，完全由CPU去进行调度，就有可能会出现上面的线程饥饿现象，导致资源的浪费，因此我们引入了线程同步的概念，在保证线程访问安全的前提下，通过条件变量等机制去控制线程，使得多个线程能够按照一定的顺序、时间和方式执行。</p>
+<h4 id="4-1-条件变量"><a href="#4-1-条件变量" class="headerlink" title="4.1 条件变量"></a>4.1 条件变量</h4><p>以下是pthread库提供的条件变量接口：</p>
+<p><strong>条件变量：</strong></p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">pthread_cond_t</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>初始化：</strong></p>
+<p>类似于锁，pthread库提供了两种初始化条件变量方式：</p>
+<ul>
+<li>init接口，第二个参数可以设置条件变量属性</li>
+<li>通过宏 PTHREAD_COND_INITIALIZER只能创建用于静态内存的锁，即在定义时直接声明的变量</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">pthread_cond_init</span><span class="params">(<span class="type">pthread_cond_t</span> *<span class="keyword">restrict</span> cond,</span></span><br><span class="line"><span class="params">              <span class="type">const</span> <span class="type">pthread_condattr_t</span> *<span class="keyword">restrict</span> attr)</span>;</span><br><span class="line"><span class="type">pthread_cond_t</span> cond = PTHREAD_COND_INITIALIZER;              		  </span><br></pre></td></tr></table></figure>
+
+<p><strong>等待条件变量信号：</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">int pthread_cond_timedwait(pthread_cond_t *restrict cond,</span><br><span class="line">              pthread_mutex_t *restrict mutex,</span><br><span class="line">              const struct timespec *restrict abstime);</span><br><span class="line">int pthread_cond_wait(pthread_cond_t *restrict cond,</span><br><span class="line">              pthread_mutex_t *restrict mutex);</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>第一个参数为条件变量，第二个参数为锁，目的是<strong>保证条件变量读写的原子性</strong></li>
+<li>timedwait接口的多出的第三个参数可以设置等待的时间</li>
+</ul>
+<p><strong>!!! 注意，pthread库在wait和timewait内部做了类似下面的特殊处理：</strong></p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">pthread_cond_wait</span><span class="params">(<span class="type">pthread_cond_t</span> *<span class="keyword">restrict</span> cond,<span class="type">pthread_mutex_t</span> *<span class="keyword">restrict</span> mutex)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// 解锁</span></span><br><span class="line">   pthread_mutex_unlock(mutex);</span><br><span class="line">    <span class="comment">// 阻塞等待条件变量信号</span></span><br><span class="line">   	 ...</span><br><span class="line">    <span class="comment">// 收到条件变量信号，如果有锁资源，加锁，没有锁资源，阻塞等待加锁</span></span><br><span class="line">   pthread_mutex_lock(mutex);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在进行条件变量信号等待时，会先进行解锁，阻塞等待条件变量信号，直到收到信号才会进行加锁。<strong>这样处理的目的是防止线程阻塞时占用锁资源，使得其他线程没法及时获得锁资源。</strong></p>
+<p>这种特殊处理会导致使用条件变量时出现下面的情况：</p>
+<p>收到条件变量信号的某个线程加锁后开始执行任务，其他线程的状态为阻塞等待条件变量信号或者阻塞等待锁资源，但假如拿到锁的线程退出后没有释放锁，就会导致其他线程一只阻塞等待阻塞等待加锁。</p>
+<p><strong>为了避免这种情况的发生，需要程序员在程执行完后手动释放锁资源。</strong></p>
+<p><strong>发送条件变量信号：</strong></p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">pthread_cond_broadcast</span><span class="params">(<span class="type">pthread_cond_t</span> *cond)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_cond_signal</span><span class="params">(<span class="type">pthread_cond_t</span> *cond)</span>;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>第一个接口会向所有阻塞在cond条件变量下的线程发送信号</li>
+<li>第二个接口会向至少一个阻塞在cond条件变量下的线程发送信号</li>
+</ul>
+<h4 id="4-2-生产消费者模型–阻塞队列"><a href="#4-2-生产消费者模型–阻塞队列" class="headerlink" title="4.2 生产消费者模型–阻塞队列"></a>4.2 生产消费者模型–阻塞队列</h4><p>生产消费者是线程同步中常用的一个模型，它不仅能保证各种操作的原子性，还能实现访问控制。</p>
+<p>生产消费者模型结构：</p>
+<ul>
+<li>任务队列：存放待执行任务的队列，</li>
+<li>生产者：主线程向任务队列中添加任务并通知子线程</li>
+<li>消费者：子线程从任务队列中取出任务并通知主线程</li>
+</ul>
+<p>通过锁来保证生产者添加任务和消费者取出任务操作的原子性，通过条件变量来控制线程。</p>
+<p>下面是生产消费者模型的一个简单示例：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TaskQueue</span>&#123;</span></span><br><span class="line">private:</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">queue</span>&lt;Task*&gt; queue_;</span><br><span class="line">    <span class="type">pthread_mutex_t</span> *mutex;</span><br><span class="line">    <span class="type">pthread_cond_t</span> *cond;</span><br><span class="line">    <span class="type">int</span> MaxNum;</span><br><span class="line">public:</span><br><span class="line">    TaskQueue(<span class="type">int</span> n)</span><br><span class="line">    :MaxNum(n)</span><br><span class="line">    &#123;</span><br><span class="line">        pthread_mutex_init(mutex,nullptr);</span><br><span class="line">        pthread_cond_init(cond,nullptr);</span><br><span class="line">    &#125;</span><br><span class="line">public:</span><br><span class="line">    <span class="type">void</span> <span class="title function_">push</span><span class="params">(Task *t)</span></span><br><span class="line">    &#123;</span><br><span class="line">        pthread_mutex_lock(mutex);</span><br><span class="line">        <span class="keyword">if</span>(queue_.size()&gt;= MaxNum)</span><br><span class="line">        &#123;</span><br><span class="line">            pthread_cond_wait(cond,mutex);</span><br><span class="line">        &#125;</span><br><span class="line">        queue_.push(t);</span><br><span class="line">        pthread_cond_signal(cond);</span><br><span class="line">        pthread_mutex_unlock(mutex);</span><br><span class="line">    &#125;</span><br><span class="line">    Task* <span class="title function_">pop</span><span class="params">()</span></span><br><span class="line">    &#123;</span><br><span class="line">        pthread_mutex_lock(mutex);</span><br><span class="line">        <span class="keyword">if</span>(queue_.size()== <span class="number">0</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            pthread_cond_wait(cond,mutex);</span><br><span class="line">        &#125;</span><br><span class="line">        Task *t = queue_.front();</span><br><span class="line">        queue_.pop();</span><br><span class="line">        pthread_cond_signal(cond);</span><br><span class="line">        pthread_mutex_unlock(mutex);</span><br><span class="line">        <span class="keyword">return</span> t;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="5-线程池"><a href="#5-线程池" class="headerlink" title="5.线程池"></a>5.线程池</h2><p>线程池是通过<strong>池化技术</strong>实现的一种管理线程的技术栈，通过线程池技术，我们可以将线程的创建和任务的执行解耦开来，从而实现<strong>降低资源消耗</strong>、<strong>提高响应速度</strong> 、<strong>方便线程管理</strong>。</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Threadpool</span>&#123;</span></span><br><span class="line">private:</span><br><span class="line">    Threadpool(<span class="type">int</span> threadNum)</span><br><span class="line">    :threadNum_(threadNum)</span><br><span class="line">    &#123;&#125;</span><br><span class="line">    Threadpool(<span class="type">const</span> Threadpool &amp;)=delete;</span><br><span class="line">    Threadpool &amp; operator =(<span class="type">const</span> Threadpool &amp;)=delete;</span><br><span class="line">    ~Threadpool();</span><br><span class="line">public:</span><br><span class="line">    <span class="comment">// 获得线程池单例</span></span><br><span class="line">    <span class="type">static</span> Threadpool* <span class="title function_">GetInstance</span><span class="params">(<span class="type">int</span> threadNum)</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">// Double Check Lock</span></span><br><span class="line">        <span class="keyword">if</span>(instance == nullptr)</span><br><span class="line">        &#123;</span><br><span class="line">            pthread_mutex_lock(&amp;Mutex);</span><br><span class="line">            <span class="keyword">if</span>(instance ==nullptr)</span><br><span class="line">            &#123;</span><br><span class="line">                instance = new Threadpool(threadNum);</span><br><span class="line">            &#125;</span><br><span class="line">            pthread_mutex_unlock(&amp;Mutex);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> instance;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 添加任务到任务队列</span></span><br><span class="line">    <span class="type">void</span> <span class="title function_">addTask</span><span class="params">(<span class="type">void</span>(*)(<span class="type">void</span>*),<span class="type">void</span> *args)</span>;</span><br><span class="line">    <span class="comment">// 添加空任务到任务队列</span></span><br><span class="line">    <span class="type">void</span> <span class="title function_">joinAll</span><span class="params">()</span>;</span><br><span class="line">private:</span><br><span class="line">    <span class="type">static</span> <span class="type">void</span>* <span class="title function_">run</span><span class="params">(<span class="type">void</span> *args)</span>;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">Task</span>&#123;</span></span><br><span class="line">        Task(<span class="type">void</span> (*func)(<span class="type">void</span>*),<span class="type">void</span> *args)</span><br><span class="line">        :args_(args)</span><br><span class="line">        ,func_(func)</span><br><span class="line">        &#123;&#125;</span><br><span class="line"></span><br><span class="line">        <span class="type">void</span> *args_;<span class="comment">// 参数</span></span><br><span class="line">        <span class="type">void</span> (*func_)(<span class="type">void</span> *); <span class="comment">// 任务函数指针</span></span><br><span class="line">    &#125;;</span><br><span class="line">    <span class="type">static</span> Threadpool * instance;</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">queue</span>&lt;Task*&gt; Taskqueue;<span class="comment">// 任务队列</span></span><br><span class="line">    <span class="type">pthread_mutex_t</span> queueMutex;<span class="comment">// 锁</span></span><br><span class="line">    <span class="type">static</span> <span class="type">pthread_mutex_t</span> Mutex; <span class="comment">// 单例锁</span></span><br><span class="line">    <span class="type">pthread_cond_t</span> queueCond;<span class="comment">// 条件变量</span></span><br><span class="line">    <span class="type">pthread_t</span> * threads; </span><br><span class="line">    <span class="type">int</span> threadNum_;<span class="comment">// 线程数量</span></span><br><span class="line">    <span class="type">bool</span> stop;</span><br><span class="line">&#125;;</span><br><span class="line">Threadpool * Threadpool::instance =nullptr;</span><br><span class="line"><span class="type">pthread_mutex_t</span> Threadpool::Mutex;</span><br><span class="line"></span><br><span class="line">Threadpool::~Threadpool()</span><br><span class="line">&#123;</span><br><span class="line">    stop = <span class="literal">true</span>;</span><br><span class="line">    <span class="comment">// 唤醒所有线程</span></span><br><span class="line">    pthread_cond_broadcast(&amp;queueCond);</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">0</span>;i&lt;threadNum_;i++)</span><br><span class="line">    &#123;</span><br><span class="line">        pthread_join(threads[i],nullptr);</span><br><span class="line">    &#125;</span><br><span class="line">    delete [] threads;</span><br><span class="line">    pthread_mutex_destroy(&amp;queueMutex);</span><br><span class="line">    pthread_cond_destroy(&amp;queueCond);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> * <span class="title function_">Threadpool::run</span><span class="params">(<span class="type">void</span> *args)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">while</span>(<span class="literal">true</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        pthread_mutex_lock(&amp;instance-&gt;queueMutex);</span><br><span class="line">        <span class="keyword">while</span>(instance-&gt;Taskqueue.empty() &amp;&amp; !instance-&gt;stop)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="comment">// 等待线程被唤醒</span></span><br><span class="line">            pthread_cond_wait(&amp;instance-&gt;queueCond,&amp;instance-&gt;queueMutex);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span>(instance-&gt;stop)</span><br><span class="line">        &#123;</span><br><span class="line">            pthread_mutex_unlock(&amp;instance-&gt;queueMutex);</span><br><span class="line">            pthread_exit(nullptr);</span><br><span class="line">        &#125;</span><br><span class="line">        Task * task = instance-&gt;Taskqueue.front();</span><br><span class="line">        instance-&gt;Taskqueue.pop();</span><br><span class="line">        pthread_mutex_unlock(&amp;instance-&gt;queueMutex);</span><br><span class="line">        <span class="keyword">if</span>(task)</span><br><span class="line">        &#123;</span><br><span class="line">            task-&gt;func_(task-&gt;args_);</span><br><span class="line">            delete task;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> nullptr;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">Threadpool::addTask</span><span class="params">(<span class="type">void</span> (*func)(<span class="type">void</span>*),<span class="type">void</span> *args)</span></span><br><span class="line">&#123;</span><br><span class="line">    Task *task= new Task(func,args);</span><br><span class="line">    pthread_mutex_lock(&amp;queueMutex);</span><br><span class="line">    Taskqueue.push(task);</span><br><span class="line">    <span class="comment">// 通知消费者消费</span></span><br><span class="line">    pthread_cond_signal(&amp;queueCond);</span><br><span class="line">    pthread_mutex_unlock(&amp;queueMutex);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 向队列添加空任务</span></span><br><span class="line"><span class="type">void</span> Threadpool:: joinAll()</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">0</span>;i&lt;threadNum_;i++)</span><br><span class="line">    &#123;</span><br><span class="line">        addTask(nullptr,nullptr);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Threadpool::Threadpool(<span class="type">int</span> threadNum)</span><br><span class="line">&#123;</span><br><span class="line">    this-&gt;threadNum_ = threadNum;</span><br><span class="line">    pthread_mutex_init(&amp;queueMutex,<span class="literal">NULL</span>);</span><br><span class="line">    pthread_cond_init(&amp;queueCond,<span class="literal">NULL</span>);</span><br><span class="line">    threads = new <span class="type">pthread_t</span>[threadNum];</span><br><span class="line">    stop = <span class="literal">false</span>;</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">0</span>;i&lt;threadNum;i++)</span><br><span class="line">    &#123;</span><br><span class="line">        pthread_create(&amp;threads[i],<span class="literal">NULL</span>,run,this);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
 ]]></content>
       <categories>
         <category>Linux</category>

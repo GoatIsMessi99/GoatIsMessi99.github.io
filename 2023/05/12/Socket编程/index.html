@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+
+
+<html lang="en">
+  
+
+    <head>
+      <meta charset="utf-8" />
+        
+      <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=1"
+      />
+      <title>Tcp/Udp协议及Linux下Socket编程 |  嘉禾望岗</title>
+  <meta name="generator" content="hexo-theme-ayer">
+      
+      <link rel="shortcut icon" href="/favicon.ico" />
+       
+<link rel="stylesheet" href="/dist/main.css">
+
+      
+<link rel="stylesheet" href="/css/fonts/remixicon.css">
+
+      
+<link rel="stylesheet" href="/css/custom.css">
+ 
+      <script src="https://cdn.staticfile.org/pace/1.2.4/pace.min.js"></script>
+       
+ 
+
+      <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-bulma@5.0.1/bulma.min.css"
+      />
+      <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.19/dist/sweetalert2.min.js"></script>
+
+      <!-- mermaid -->
+      
+      <script src="https://cdn.staticfile.org/mermaid/8.14.0/mermaid.min.js"></script>
+      
+      <style>
+        .swal2-styled.swal2-confirm {
+          font-size: 1.6rem;
+        }
+      </style>
+    <link rel="alternate" href="/atom.xml" title="嘉禾望岗" type="application/atom+xml">
+</head>
+  </html>
+</html>
+
+
+<body>
+  <div id="app">
+    
+      
+    <main class="content on">
+      <section class="outer">
+  <article
+  id="post-Socket编程"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h1 class="article-title sea-center" style="border-left:0" itemprop="name">
+  Tcp/Udp协议及Linux下Socket编程
+</h1>
+ 
+
+      
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2023/05/12/Socket%E7%BC%96%E7%A8%8B/" class="article-date">
+  <time datetime="2023-05-11T16:00:00.000Z" itemprop="datePublished">2023-05-12</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Linux/">Linux</a>
+  </div>
+  
+<div class="word_count">
+    <span class="post-time">
+        <span class="post-meta-item-icon">
+            <i class="ri-quill-pen-line"></i>
+            <span class="post-meta-item-text"> Word count:</span>
+            <span class="post-count">3.7k</span>
+        </span>
+    </span>
+
+    <span class="post-time">
+        &nbsp; | &nbsp;
+        <span class="post-meta-item-icon">
+            <i class="ri-book-open-line"></i>
+            <span class="post-meta-item-text"> Reading time≈</span>
+            <span class="post-count">14 min</span>
+        </span>
+    </span>
+</div>
+ 
+    </div>
+      
+    <div class="tocbot"></div>
+
+
+
+
+  
+    <div class="article-entry" itemprop="articleBody">
+       
+  <h2 id="1-OSI七层模型"><a href="#1-OSI七层模型" class="headerlink" title="1. OSI七层模型"></a>1. OSI七层模型</h2><p>OSI是国际标准化组织（ISO）提出的网络体系结构模型，作为<strong>开放系统互连参考模型</strong>，是进行网络通信的基本框架。OS七层模型分别为：应用层、表示层、会话层、传输层、网络层、数据链路层、物理层，但是在实际网络通信框架中，一般只设有五层：应用层、传输层、网络层、数据链路层、物理层，将表示层和会话层的内容统一到应用层中。</p>
+<p><strong>报文：</strong></p>
+<p>报文 &#x3D; 报头 + 数据部分</p>
+<p>通过将网络划分成不同层结构，实现任务的划分，每一层都有自己对应的处理任务和特有的属性。</p>
+<p>不同层之间采用报文的方式来传递数据，报文由报头和数据部分组成，每一层都有自己的报头，其中报头就填充着每一层的属性字段。</p>
+<p>向下交付时，每一层向下交付的报文都会成为下一层的数据部分，下一层再组装上自己的报头以后就继续向下交付。</p>
+<p><img src="http://lemon-pi.oss-cn-beijing.aliyuncs.com/img/4.5.png"></p>
+<h2 id="2-传输层协议"><a href="#2-传输层协议" class="headerlink" title="2. 传输层协议"></a>2. 传输层协议</h2><p>在实际网络通信五层框架中，每一层都有对应的任务和执行任务的约束–协议，其中传输层的任务就是负责为<strong>端到端连接提供可靠的传输服务</strong>，对应的传输层协议就是Tcp&#x2F;Udp协议。</p>
+<p><strong>端口号：</strong></p>
+<p>传输层端到端指的就是端口号，端口号是主机上进程的唯一标识。通过端口号，数据从传输层向应用层交付时，就知道数据该交给哪一个进程。</p>
+<p><strong>套接字Socket：</strong></p>
+<p>Socket &#x3D; IP地址：端口号，例如：433.25.25.25：8081</p>
+<p>Socket标识着网络中一台主机上的一个进程</p>
+<p><strong>无连接服务和面向连接服务：</strong></p>
+<p>无连接服务指通信双方在进行通信之前，不需要进行连接操作，直接进行通信，从而提高通信的效率，但也因此不能保障通信的安全和可靠性。Udp协议就是提供无连接服务。</p>
+<p>面向连接服务指通信双方在进行通信之前，先需要建立通信双方之间的连接，从而对双方的通信进行实时的监控和管理，因此能保障通信的安全和可靠性，但会导致通信的效率降低。Tcp协议就是提供面向连接服务。</p>
+<h3 id="2-1-Udp协议"><a href="#2-1-Udp协议" class="headerlink" title="2.1 Udp协议"></a>2.1 Udp协议</h3><p>Udp协议提供无连接的数据报服务，一次发送一个报文，不对报文进行拆分和合并，而是保留这些报文的边界。</p>
+<h4 id="Udp报头格式："><a href="#Udp报头格式：" class="headerlink" title="Udp报头格式："></a><strong>Udp报头格式：</strong></h4><p><img src="http://lemon-pi.oss-cn-beijing.aliyuncs.com/img/4.4.png"></p>
+<ul>
+<li>源&#x2F;目的端口：发送方&#x2F;接受方对应进程的端口号</li>
+<li>总长度：报头+数据的长度</li>
+<li>校验和：检验Udp报文是否传输中出错</li>
+</ul>
+<h3 id="2-2-Tcp协议"><a href="#2-2-Tcp协议" class="headerlink" title="2.2 Tcp协议"></a>2.2 Tcp协议</h3><p>Tcp协议提供面向连接的字节流服务，通信前需要连接双方之间的连接，对发送数据的每一个字节都进行了编号，保证传送的数据无差错、不丢失、有序，可以对报文进行拆分和合并。</p>
+<h4 id="Tcp报头格式："><a href="#Tcp报头格式：" class="headerlink" title="Tcp报头格式："></a><strong>Tcp报头格式：</strong></h4><p><img src="http://lemon-pi.oss-cn-beijing.aliyuncs.com/img/4.3.png"></p>
+<ul>
+<li>源&#x2F;目的端口：发送方&#x2F;接受方对应进程的端口号</li>
+<li>序号：数据部分的第一个字节的编号</li>
+<li>确认号：接收方已经正确接收到的数据的最后一个字节的编号</li>
+<li>数据偏移：4位，数据范围 0101 - 1111，单位是4B，即报头长度是20B - 60B</li>
+<li>保留：保留字段，留作以后的使用</li>
+<li>UGR：置1时表明紧急指针字段有效，操作系统尽快读取紧急指针指向的数据段</li>
+<li>ACK：置1时表明确认号字段有效，Tcp协议规定在建立好连接后通信时，ACK段也必须置为1</li>
+<li>PSH：置1时表明操作系统不需等待接收缓冲区满，直接读取数据</li>
+<li>RST：置1时表明当前Tcp连接出错，重新建立连接</li>
+<li>SYN：置1时表明这个Tcp报文是Tcp连接报文或Tcp确认连接报文</li>
+<li>FIN：置1时表明这个是发送方断开连接请求</li>
+<li>窗口：表明发送数据的速度，值 &#x3D; min （接收方接收能力，发送方所处网络的拥塞情况）</li>
+<li>检验和：检验数据是否在传输过程出错</li>
+</ul>
+<h4 id="确认应答机制（ACK）："><a href="#确认应答机制（ACK）：" class="headerlink" title="确认应答机制（ACK）："></a>确认应答机制（ACK）：</h4><p>Tcp协议使用了确认应答机制来提高数据传输的可靠性，发送方会在Tcp报头的序号字段填写发送数据的第一个字节的编号，接受方在收到正确且有序的报文后，会在回复报文（ACK）的的确认号字段填上收到连续数据的最后一个字节编号，表明接收方已经正确收到了编号之前对应的所有数据，如果出现数据不连续的情况，例如收到了0-1000，2001-3000，3001-4000的Tcp报文，接收方就会在Tcp报文的确认好字段填上1001，表明编号1001后的报文没有收到，发送方会重传编号1001以后的Tcp报文，但此时会出现报文重复的情况，接收方会甄别并丢弃重复的Tcp报文。通过这种确认应答机制，可以保证数据的不丢失且有序。</p>
+<h4 id="超时重传机制："><a href="#超时重传机制：" class="headerlink" title="超时重传机制："></a>超时重传机制：</h4><p>Tcp协议使用超时重传机制来解决传输过程中丢包的情况，发生以下几种情况时，会进行Tcp报文的重传：</p>
+<ul>
+<li>发送的报文因为网络拥塞等原因，无法到达接收方主机，发送方超过一段时间没收到ACK就会进行重传</li>
+<li>接收方的ACK在网络拥塞等原因，无法到达发送方主机，发送方超过一段时间没收到ACK就会进行重传</li>
+</ul>
+<p>Linux为了保证无论在任何环境下都能比较高性能的通信, 因此会动态计算这个最大超时时间</p>
+<blockquote>
+<ul>
+<li><p>Linux中 超时以500ms为一个单位进行控制, 每次判定超时重发的超时</p>
+<p>时间都是500ms的整数倍</p>
+</li>
+<li><p>如果重发一次之后, 仍然得不到应答, 等待 2*500ms 后再进行重传</p>
+</li>
+<li><p>如果仍然得不到应答, 等待 4*500ms 进行重传. 依次类推, 以指数形式递增</p>
+</li>
+<li><p>累计到一定的重传次数, TCP认为网络或者对端主机出现异常, 强制关闭连接</p>
+</li>
+</ul>
+</blockquote>
+<h4 id="TCP流量控制（滑动窗口）："><a href="#TCP流量控制（滑动窗口）：" class="headerlink" title="TCP流量控制（滑动窗口）："></a>TCP流量控制（滑动窗口）：</h4><p>为了消除通信双方网络环境和数据处理能力带来的数据传输能力不一致的问题，TCP使用了滑动窗口来进行传输速率的控制。</p>
+<p>在通信过程中，接收方会在Tcp报文的窗口字段填写自己的接收缓冲区的剩余大小（rwnd，接收窗口）来告诉发送方自己的数据接收能力，发送方在收到报文后，会再结合自身网络拥塞情况（cwnd，拥塞窗口）的情况，来动态调整发送窗口的大小。</p>
+<p>发送窗口 &#x3D; min （rwnd，cwnd）</p>
+<h4 id="TCP拥塞控制："><a href="#TCP拥塞控制：" class="headerlink" title="TCP拥塞控制："></a>TCP拥塞控制：</h4><p>TCP拥塞控制有两种算法：</p>
+<ul>
+<li><p>慢开始和拥塞避免</p>
+<p>设立拥塞窗口阈值初始值为n</p>
+<p>慢开始阶段：cwnd初始值为1，以2倍增长（2 4 8 16 …)  直到等于阈值n，开始拥塞避免阶段</p>
+<p>拥塞避免阶段：线性增长，cwnd每次加1，直到出现网络拥塞，将拥塞窗口阈值设为此时cwnd的一半（假设出现网络拥塞时cwnd为							  34，则新的拥塞窗口阈值为17），然后将cwnd设为1，从新进入慢开始阶段</p>
+</li>
+<li><p>快恢复</p>
+</li>
+</ul>
+<p>​	当出现冗余ACK的时候，采用快恢复算法，将拥塞窗口阈值设为此时cwnd的一半，与拥塞避免阶段不同的是，cwnd不是从1开始，而是直接从新的拥塞窗口阈值开始线性增长。</p>
+<h4 id="TCP三次握手-x2F-四次挥手："><a href="#TCP三次握手-x2F-四次挥手：" class="headerlink" title="TCP三次握手&#x2F;四次挥手："></a>TCP三次握手&#x2F;四次挥手：</h4><p><img src="http://lemon-pi.oss-cn-beijing.aliyuncs.com/img/4.6.png"></p>
+<p><strong>服务端状态转换：</strong></p>
+<ul>
+<li><p>[CLOSED -&gt; LISTEN] 服务器端调用listen后进入LISTEN状态, 等待客户端连接</p>
+</li>
+<li><p>[LISTEN -&gt; SYN_RCVD] 一旦监听到连接请求(同步报文段), 就将该连接放入内核等待队列中, 并向客户端发送SYN确认报文</p>
+</li>
+<li><p>[SYN_RCVD -&gt; ESTABLISHED] 服务端一旦收到客户端的确认报文, 就进入ESTABLISHED状态, 可以进行读写数据了</p>
+</li>
+<li><p>[ESTABLISHED -&gt; CLOSE_WAIT] 当客户端主动关闭连接(调用close), 服务器会收到结束报文段, 服务器返回确认报文段并进入CLOSE_WAIT</p>
+</li>
+<li><p>[CLOSE_WAIT -&gt; LAST_ACK] 进入CLOSE_WAIT后说明服务器准备关闭连接(需要处理完之前的数据); 当</p>
+<p>服务器真正调用close关闭连接时, 会向客户端发送FIN, 此时服务器进入LAST_ACK状态, 等待最后一个</p>
+<p>ACK到来(这个ACK是客户端确认收到了FIN)</p>
+</li>
+<li><p>[LAST_ACK -&gt; CLOSED] 服务器收到了对FIN的ACK, 彻底关闭连接</p>
+</li>
+</ul>
+<p><strong>客户端状态转换：</strong></p>
+<ul>
+<li>[CLOSED -&gt; SYN_SENT] 客户端调用connect, 发送同步报文段</li>
+<li>[SYN_SENT -&gt; ESTABLISHED] connect调用成功, 则进入ESTABLISHED状态, 开始读写数据</li>
+<li>[ESTABLISHED -&gt; FIN_WAIT_1] 客户端主动调用close时, 向服务器发送结束报文段, 同时进入FIN_WAIT_1</li>
+<li>[FIN_WAIT_1 -&gt; FIN_WAIT_2] 客户端收到服务器对结束报文段的确认, 则进入FIN_WAIT_2, 开始等待服务器的结束报文段</li>
+<li>[FIN_WAIT_2 -&gt; TIME_WAIT] 客户端收到服务器发来的结束报文段, 进入TIME_WAIT, 并发出LAST_ACK</li>
+<li>[TIME_WAIT -&gt; CLOSED] 客户端要等待一个2MSL(Max Segment Life, 报文最大生存时间)的时间, 才会进入CLOSED状态</li>
+</ul>
+<p><strong>TIME_WAIT状态：</strong></p>
+<ul>
+<li>TCP协议规定,主动关闭连接的一方要处于TIME_ WAIT状态,等待两个MSL(maximum segment lifetime)的时间后才能关闭</li>
+<li>MSL是TCP报文的最大生存时间，设置为2MSL就能保证在两个传输方向上的尚未被接收或迟到的报文段都已经消失</li>
+<li>同时也是在理论上保证最后一个报文可靠到达(假设最后一个ACK丢失, 那么服务器会再重发一个FIN. 这时虽然客户端的进程不在了, 但是TCP连接还在, 仍然可以重发LAST_ACK)</li>
+</ul>
+<h2 id="3-Linux下Socket编程"><a href="#3-Linux下Socket编程" class="headerlink" title="3. Linux下Socket编程"></a>3. Linux下Socket编程</h2><h3 id="3-1-UdpSocket"><a href="#3-1-UdpSocket" class="headerlink" title="3.1 UdpSocket"></a>3.1 UdpSocket</h3><h4 id="3-1-1-socket"><a href="#3-1-1-socket" class="headerlink" title="3.1.1 socket"></a>3.1.1 socket</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">socket</span><span class="params">(<span class="type">int</span> domain, <span class="type">int</span> type, <span class="type">int</span> protocol)</span>;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>domain 作用域 本地或网络</li>
+</ul>
+<blockquote>
+<p>Name               					  Purpose                         				        Man page<br>AF_UNIX, AF_LOCAL  		  Local communication                          unix(7)<br>AF_INET             				    IPv4 Internet protocols                       ip(7)<br>AF_INET6           					IPv6 Internet protocols                       ipv6(7)<br>AF_IPX              					  IPX - Novell protocols<br>AF_NETLINK                          Kernel user interface device              netlink(7)<br>AF_X25                                   ITU-T X.25 &#x2F; ISO-8208 protocol          x25(7)<br>AF_AX25                                Amateur radio AX.25 protocol<br>AF_ATMPVC                          Access to raw ATM PVCs<br>AF_APPLETALK                     Appletalk                                               ddp(7)<br>AF_PACKET                           Low level packet interface                  packet(7)</p>
+</blockquote>
+<ul>
+<li>type 报文类型</li>
+</ul>
+<blockquote>
+<p>SOCK_STREAM   字节流 Tcp通信选项</p>
+<p>SOCK_DGRAM    数据报 Udp通信选项</p>
+<p>SOCK_RAW          原始格式</p>
+</blockquote>
+<ul>
+<li>protocol  一般设为0</li>
+</ul>
+<blockquote>
+<p>RETURN VALUE<br>       On success, a file descriptor for the new socket is returned.  On error, -1 is returned, and errno is set appropriately.</p>
+</blockquote>
+<p>Linux一切皆文件，socket创建一个socket文件，返回该文件的文件描述符(失败返回-1）。socket文件内部针对网络通信封装了各种API，字段，将网络通信转化为对文件的操作。</p>
+<h4 id="3-1-2-bind"><a href="#3-1-2-bind" class="headerlink" title="3.1.2 bind"></a>3.1.2 bind</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">bind</span><span class="params">(<span class="type">int</span> sockfd, <span class="keyword">struct</span> sockaddr *my_addr, <span class="type">socklen_t</span> addrlen)</span>;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>sockfd   socket文件描述符</li>
+<li>my_addr  网络结构体，填充IP、IP协议类型、端口</li>
+<li>addrlen  结构体大小</li>
+</ul>
+<h5 id="struct-sockaddr："><a href="#struct-sockaddr：" class="headerlink" title="struct sockaddr："></a>struct sockaddr：</h5><blockquote>
+<p>由于早期c语言不支持void *，所以采用了统一的struct sockaddr结构体来接收不同类型的作用域结构体。我们需要将所选作用域结构体的字段填充好，再强转成 struct sockaddr * </p>
+<p>IPv4协议对应的网络结构体 ：struct sockaddr_in     IPv6协议对应的网络结构体： struct socaddr_in6</p>
+</blockquote>
+<p><img src="http://lemon-pi.oss-cn-beijing.aliyuncs.com/img/4.7.png"></p>
+<p>bind会将my_addr结构体中的各个属性和进程进行绑定，my_addr中的IP字段作为进程所在主机的IP地址，端口字段作为该进程的标识符，到达传输层的报文就会根据端口号向应用层对应的进程交付数据</p>
+<p><img src="http://lemon-pi.oss-cn-beijing.aliyuncs.com/img/4.8.png"></p>
+<h4 id="3-1-3-recvfrom"><a href="#3-1-3-recvfrom" class="headerlink" title="3.1.3 recvfrom"></a>3.1.3 recvfrom</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">ssize_t</span> <span class="title function_">recvfrom</span><span class="params">(<span class="type">int</span> sockfd, <span class="type">void</span> *buf, <span class="type">size_t</span> len, <span class="type">int</span> flags,</span></span><br><span class="line"><span class="params">                 <span class="keyword">struct</span> sockaddr *src_addr, <span class="type">socklen_t</span> *addrlen)</span>;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>sockfd  socket文件描述符</li>
+<li>buf  接收数据缓冲区</li>
+<li>len 缓冲区大小</li>
+<li>flag  等待数据方式，0为阻塞等待</li>
+<li>src_addr 输入输出型参数，可以获取客户端的IP和端口号</li>
+</ul>
+<blockquote>
+<p>RETURN VALUE<br>       These  calls  return the number of bytes received, or -1 if an error occurred.  In the event of an error, errno is set to indicate the error.  The return value<br>       will be 0 when the peer has performed an orderly shutdown.</p>
+</blockquote>
+<p>recvfrom会返回接收到数据的字节数</p>
+<h4 id="3-1-4-sendto"><a href="#3-1-4-sendto" class="headerlink" title="3.1.4 sendto"></a>3.1.4 sendto</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">ssize_t</span> <span class="title function_">sendto</span><span class="params">(<span class="type">int</span> sockfd, <span class="type">const</span> <span class="type">void</span> *buf, <span class="type">size_t</span> len, <span class="type">int</span> flags,</span></span><br><span class="line"><span class="params">                      <span class="type">const</span> <span class="keyword">struct</span> sockaddr *dest_addr, <span class="type">socklen_t</span> addrlen)</span>;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>sockfd  socket文件描述符</li>
+<li>buf  发送数据缓冲区</li>
+<li>len   发送数据缓冲区大小</li>
+<li>flags  一般设为0</li>
+<li>dest_addr 输入型参数，向服务器发送本地的IP和进程对应的端口号</li>
+</ul>
+<p>以下是一个基于Udp套接字编写的客户端&#x2F;服务端简单实例</p>
+<p><strong>服务端：</strong></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> BUF_SIZE 1024</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Udpserver</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Udpserver</span>(<span class="type">uint16_t</span> port, std::string ip = <span class="string">&quot;&quot;</span>)</span><br><span class="line">        : <span class="built_in">port_</span>(port), <span class="built_in">ip_</span>(ip), <span class="built_in">sockfd_</span>(<span class="number">-1</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        sockfd_ = <span class="built_in">socket</span>(AF_INET, SOCK_DGRAM, <span class="number">0</span>);</span><br><span class="line">        <span class="keyword">if</span> (sockfd_ &lt; <span class="number">0</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="built_in">log</span>(FATAL, <span class="string">&quot;create server socket err&quot;</span>);</span><br><span class="line">            <span class="built_in">exit</span>(<span class="number">-1</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">struct</span> <span class="title class_">sockaddr_in</span> local;</span><br><span class="line">        local.sin_addr.s_addr = ip_.<span class="built_in">empty</span>() ? <span class="built_in">htonl</span>(INADDR_ANY) : <span class="built_in">inet_addr</span>(ip_.<span class="built_in">c_str</span>());</span><br><span class="line">        local.sin_family = AF_INET;</span><br><span class="line">        local.sin_port = port_;</span><br><span class="line">        <span class="keyword">if</span> (<span class="built_in">bind</span>(sockfd_, (<span class="type">const</span> sockaddr *)&amp;local, <span class="built_in">sizeof</span>(local)) &lt; <span class="number">0</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="built_in">log</span>(FATAL, <span class="string">&quot;server bind socket err&quot;</span>);</span><br><span class="line">            <span class="built_in">exit</span>(<span class="number">-1</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="built_in">log</span>(DEBUG,<span class="string">&quot;server bind success&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">loop</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="type">char</span> buffer[BUF_SIZE];</span><br><span class="line">        <span class="keyword">while</span> (<span class="literal">true</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="comment">// 输出型参数</span></span><br><span class="line">            <span class="keyword">struct</span> <span class="title class_">sockaddr_in</span> peer;</span><br><span class="line">            <span class="type">socklen_t</span> len = <span class="built_in">sizeof</span>(peer);</span><br><span class="line">            <span class="type">ssize_t</span> s = <span class="built_in">recvfrom</span>(sockfd_, buffer, <span class="built_in">sizeof</span>(buffer), <span class="number">0</span>, (<span class="keyword">struct</span> sockaddr *)&amp;peer, &amp;len);</span><br><span class="line">            <span class="keyword">if</span> (s &gt; <span class="number">0</span>)</span><br><span class="line">            &#123;</span><br><span class="line">                buffer[s] = <span class="string">&#x27;\0&#x27;</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">else</span></span><br><span class="line">            &#123;</span><br><span class="line">                <span class="built_in">log</span>(WARNING, <span class="string">&quot;recvfrom fail&quot;</span>);</span><br><span class="line">                <span class="keyword">continue</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="built_in">log</span>(INFO, <span class="string">&quot;[%s:%d]# %s&quot;</span>, <span class="built_in">inet_ntoa</span>(peer.sin_addr), <span class="built_in">ntohs</span>(peer.sin_port), buffer);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    std::string ip_;</span><br><span class="line">    std::<span class="type">uint16_t</span> port_;</span><br><span class="line">    <span class="type">int</span> sockfd_;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">(<span class="type">int</span> argc,<span class="type">char</span> *argv[])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (argc != <span class="number">2</span> &amp;&amp; argc != <span class="number">3</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">log</span>(FATAL, <span class="string">&quot;usage:[%s port [ip]]&quot;</span>, argv[<span class="number">0</span>]);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">// ./server port</span></span><br><span class="line">        <span class="keyword">if</span> (argc == <span class="number">2</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            Udpserver <span class="built_in">server</span>(<span class="built_in">atoi</span>(argv[<span class="number">1</span>]));</span><br><span class="line">            server.<span class="built_in">loop</span>();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// ./server port ip</span></span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">        &#123;</span><br><span class="line">            Udpserver <span class="built_in">server</span>(<span class="built_in">atoi</span>(argv[<span class="number">1</span>]), argv[<span class="number">2</span>]);</span><br><span class="line">            server.<span class="built_in">loop</span>();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>客户端：</strong></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> BUF_SIZE 1024</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Udpclient</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Udpclient</span>(std::<span class="type">uint16_t</span> port, std::string ip)</span><br><span class="line">        : <span class="built_in">ip_</span>(ip), <span class="built_in">port_</span>(port), <span class="built_in">sockfd_</span>(<span class="number">-1</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        sockfd_ = <span class="built_in">socket</span>(AF_INET, SOCK_DGRAM, <span class="number">0</span>);</span><br><span class="line">        <span class="keyword">if</span> (sockfd_ &lt; <span class="number">0</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="built_in">log</span>(FATAL, <span class="string">&quot;create client socket err&quot;</span>);</span><br><span class="line">            <span class="built_in">exit</span>(<span class="number">-1</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// client不需要手动bind，操作系统会自动bind</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">start</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">struct</span> <span class="title class_">sockaddr_in</span> local;</span><br><span class="line">        <span class="built_in">bzero</span>(&amp;local,<span class="built_in">sizeof</span>(local));</span><br><span class="line">        local.sin_addr.s_addr = <span class="built_in">inet_addr</span>(ip_.<span class="built_in">c_str</span>());</span><br><span class="line">        local.sin_family = AF_INET;</span><br><span class="line">        local.sin_port = port_;</span><br><span class="line">        <span class="keyword">while</span> (<span class="literal">true</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            std::cout&lt;&lt;<span class="string">&quot;Enter# &quot;</span>;</span><br><span class="line">            std::string buffer;</span><br><span class="line">            <span class="built_in">getline</span>(std::cin,buffer);</span><br><span class="line">            <span class="built_in">sendto</span>(sockfd_, buffer.<span class="built_in">c_str</span>(), buffer.<span class="built_in">size</span>(), <span class="number">0</span>, (<span class="type">const</span> <span class="keyword">struct</span> sockaddr *)&amp;local, <span class="built_in">sizeof</span>(local));</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    std::string ip_;</span><br><span class="line">    std::<span class="type">uint16_t</span> port_;</span><br><span class="line">    <span class="type">int</span> sockfd_;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">(<span class="type">int</span> argc,<span class="type">char</span> *argv[])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span>(argc == <span class="number">3</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="function">Udpclient <span class="title">client</span><span class="params">(atoi(argv[<span class="number">1</span>]),argv[<span class="number">2</span>])</span></span>;</span><br><span class="line">        client.<span class="built_in">start</span>();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span>&#123;</span><br><span class="line">        <span class="built_in">log</span>(FATAL,<span class="string">&quot;Usage:[%s port ip]&quot;</span>,argv[<span class="number">0</span>]);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>以下是运行截图：</p>
+<p><img src="http://lemon-pi.oss-cn-beijing.aliyuncs.com/img/4.9.png"></p>
+<h4 id="3-2-TcpSocket"><a href="#3-2-TcpSocket" class="headerlink" title="3.2 TcpSocket"></a>3.2 TcpSocket</h4> 
+      <!-- reward -->
+      
+      <div id="reword-out">
+        <div id="reward-btn">
+          Donate
+        </div>
+      </div>
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <div class="declare">
+      <ul class="post-copyright">
+        <li>
+          <i class="ri-copyright-line"></i>
+          <strong>Copyright： </strong>
+          
+          Copyright is owned by the author. For commercial reprints, please contact the author for authorization. For non-commercial reprints, please indicate the source.
+          
+        </li>
+      </ul>
+    </div>
+    
+    <footer class="article-footer">
+       
+<div class="share-btn">
+      <span class="share-sns share-outer">
+        <i class="ri-share-forward-line"></i>
+        分享
+      </span>
+      <div class="share-wrap">
+        <i class="arrow"></i>
+        <div class="share-icons">
+          
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="ri-weibo-fill"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="ri-wechat-fill"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="ri-qq-fill"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="ri-douban-line"></i>
+          </a>
+          <!-- <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a> -->
+          
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="ri-facebook-circle-fill"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="ri-twitter-fill"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="ri-google-fill"></i>
+          </a>
+        </div>
+      </div>
+</div>
+
+<div class="wx-share-modal">
+    <a class="modal-close" href="javascript:;"><i class="ri-close-circle-line"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//api.qrserver.com/v1/create-qr-code/?size=150x150&data=http://example.com/2023/05/12/Socket%E7%BC%96%E7%A8%8B/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div id="share-mask"></div>  
+    </footer>
+  </div>
+
+   
+  <nav class="article-nav">
+    
+    
+      <a href="/2023/04/29/%E8%BF%9B%E7%A8%8B/" class="article-nav-link">
+        <strong class="article-nav-caption">下一篇</strong>
+        <div class="article-nav-title">Linux进程</div>
+      </a>
+    
+  </nav>
+
+  
+   
+  
+   
+    <script src="https://cdn.staticfile.org/twikoo/1.4.18/twikoo.all.min.js"></script>
+    <div id="twikoo" class="twikoo"></div>
+    <script>
+        twikoo.init({
+            envId: ""
+        })
+    </script>
+ 
+</article>
+
+</section>
+      <footer class="footer">
+  <div class="outer">
+    <ul>
+      <li>
+        Copyrights &copy;
+        2023
+        <i class="ri-heart-fill heart_icon"></i> Yun Jia
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+        
+        <span>
+  <span><i class="ri-user-3-fill"></i>Visitors:<span id="busuanzi_value_site_uv"></span></span>
+  <span class="division">|</span>
+  <span><i class="ri-eye-fill"></i>Views:<span id="busuanzi_value_page_pv"></span></span>
+</span>
+        
+      </li>
+    </ul>
+    <ul>
+      
+        <li>
+          <a href="https://beian.miit.gov.cn/" target="_black" rel="nofollow">鄂ICP备2023006869号-1</a>
+        </li>
+        
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      <li>
+        <!-- cnzz统计 -->
+        
+        <script type="text/javascript" src='https://s9.cnzz.com/z_stat.php?id=1278069914&amp;web_id=1278069914'></script>
+        
+      </li>
+    </ul>
+  </div>
+</footer>    
+    </main>
+    <div class="float_btns">
+      <div class="totop" id="totop">
+  <i class="ri-arrow-up-line"></i>
+</div>
+
+<div class="todark" id="todark">
+  <i class="ri-moon-line"></i>
+</div>
+
+    </div>
+    <aside class="sidebar on">
+      <button class="navbar-toggle"></button>
+<nav class="navbar">
+  
+  <div class="logo">
+    <a href="/"><img src="/images/ayer.svg" alt="嘉禾望岗"></a>
+  </div>
+  
+  <ul class="nav nav-main">
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/">主页</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/archives">归档</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/categories">分类</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/tags">标签</a>
+    </li>
+    
+  </ul>
+</nav>
+<nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      
+      <a class="nav-item-link nav-item-search"  title="Search">
+        <i class="ri-search-line"></i>
+      </a>
+      
+      
+      <a class="nav-item-link" target="_blank" href="/atom.xml" title="RSS Feed">
+        <i class="ri-rss-line"></i>
+      </a>
+      
+    </li>
+  </ul>
+</nav>
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+    </aside>
+    <div id="mask"></div>
+
+<!-- #reward -->
+<div id="reward">
+  <span class="close"><i class="ri-close-line"></i></span>
+  <p class="reward-p"><i class="ri-cup-line"></i>请我喝杯咖啡吧~</p>
+  <div class="reward-box">
+    
+    <div class="reward-item">
+      <img class="reward-img" src="/images/wechat%20(2).jpg">
+      <span class="reward-type">支付宝</span>
+    </div>
+    
+    
+    <div class="reward-item">
+      <img class="reward-img" src="/images/wechat.jpg">
+      <span class="reward-type">微信</span>
+    </div>
+    
+  </div>
+</div>
+    
+<script src="/js/jquery-3.6.0.min.js"></script>
+ 
+<script src="/js/lazyload.min.js"></script>
+
+<!-- Tocbot -->
+ 
+<script src="/js/tocbot.min.js"></script>
+
+<script>
+  tocbot.init({
+    tocSelector: ".tocbot",
+    contentSelector: ".article-entry",
+    headingSelector: "h1, h2, h3, h4, h5, h6",
+    hasInnerContainers: true,
+    scrollSmooth: true,
+    scrollContainer: "main",
+    positionFixedSelector: ".tocbot",
+    positionFixedClass: "is-position-fixed",
+    fixedSidebarOffset: "auto",
+  });
+</script>
+
+<script src="https://cdn.staticfile.org/jquery-modal/0.9.2/jquery.modal.min.js"></script>
+<link
+  rel="stylesheet"
+  href="https://cdn.staticfile.org/jquery-modal/0.9.2/jquery.modal.min.css"
+/>
+<script src="https://cdn.staticfile.org/justifiedGallery/3.8.1/js/jquery.justifiedGallery.min.js"></script>
+
+<script src="/dist/main.js"></script>
+
+<!-- ImageViewer -->
+ <!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <!-- Background of PhotoSwipe. 
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+
+        <!-- Container that holds slides. 
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                <!--  Controls are self-explanatory. Order can be changed. -->
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" style="display:none" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<link rel="stylesheet" href="https://cdn.staticfile.org/photoswipe/4.1.3/photoswipe.min.css">
+<link rel="stylesheet" href="https://cdn.staticfile.org/photoswipe/4.1.3/default-skin/default-skin.min.css">
+<script src="https://cdn.staticfile.org/photoswipe/4.1.3/photoswipe.min.js"></script>
+<script src="https://cdn.staticfile.org/photoswipe/4.1.3/photoswipe-ui-default.min.js"></script>
+
+<script>
+    function viewer_init() {
+        let pswpElement = document.querySelectorAll('.pswp')[0];
+        let $imgArr = document.querySelectorAll(('.article-entry img:not(.reward-img)'))
+
+        $imgArr.forEach(($em, i) => {
+            $em.onclick = () => {
+                // slider展开状态
+                // todo: 这样不好，后面改成状态
+                if (document.querySelector('.left-col.show')) return
+                let items = []
+                $imgArr.forEach(($em2, i2) => {
+                    let img = $em2.getAttribute('data-idx', i2)
+                    let src = $em2.getAttribute('data-target') || $em2.getAttribute('src')
+                    let title = $em2.getAttribute('alt')
+                    // 获得原图尺寸
+                    const image = new Image()
+                    image.src = src
+                    items.push({
+                        src: src,
+                        w: image.width || $em2.width,
+                        h: image.height || $em2.height,
+                        title: title
+                    })
+                })
+                var gallery = new PhotoSwipe(pswpElement, PhotoSwipeUI_Default, items, {
+                    index: parseInt(i)
+                });
+                gallery.init()
+            }
+        })
+    }
+    viewer_init()
+</script> 
+<!-- MathJax -->
+
+<!-- Katex -->
+
+<!-- busuanzi  -->
+ 
+<script src="/js/busuanzi-2.3.pure.min.js"></script>
+ 
+<!-- ClickLove -->
+
+<!-- ClickBoom1 -->
+
+<!-- ClickBoom2 -->
+
+<!-- CodeCopy -->
+
+<!-- CanvasBackground -->
+
+<script>
+  if (window.mermaid) {
+    mermaid.initialize({ theme: "forest" });
+  }
+</script>
+
+
+    
+    <div id="music">
+    
+    
+    
+    <iframe frameborder="no" border="1" marginwidth="0" marginheight="0" width="200" height="86"
+        src="//music.163.com/outchain/player?type=2&id=2027529783&auto=1&height=66"></iframe>
+</div>
+
+<style>
+    #music {
+        position: fixed;
+        right: 15px;
+        bottom: 0;
+        z-index: 998;
+    }
+</style>
+    
+    
+
+  </div>
+</body>
+
+</html>
