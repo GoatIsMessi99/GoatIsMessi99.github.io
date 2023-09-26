@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+
+
+<html lang="en">
+  
+
+    <head>
+      <meta charset="utf-8" />
+        
+      <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=1"
+      />
+      <title>C++三大特性（封装、继承、多态） |  嘉禾望岗</title>
+  <meta name="generator" content="hexo-theme-ayer">
+      
+      <link rel="shortcut icon" href="/favicon.ico" />
+       
+<link rel="stylesheet" href="/dist/main.css">
+
+      
+<link rel="stylesheet" href="/css/fonts/remixicon.css">
+
+      
+<link rel="stylesheet" href="/css/custom.css">
+ 
+      <script src="https://cdn.staticfile.org/pace/1.2.4/pace.min.js"></script>
+       
+ 
+
+      <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-bulma@5.0.1/bulma.min.css"
+      />
+      <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.19/dist/sweetalert2.min.js"></script>
+
+      <!-- mermaid -->
+      
+      <script src="https://cdn.staticfile.org/mermaid/8.14.0/mermaid.min.js"></script>
+      
+      <style>
+        .swal2-styled.swal2-confirm {
+          font-size: 1.6rem;
+        }
+      </style>
+    <link rel="alternate" href="/atom.xml" title="嘉禾望岗" type="application/atom+xml">
+</head>
+  </html>
+</html>
+
+
+<body>
+  <div id="app">
+    
+      
+    <main class="content on">
+      <section class="outer">
+  <article
+  id="post-c++概述"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h1 class="article-title sea-center" style="border-left:0" itemprop="name">
+  C++三大特性（封装、继承、多态）
+</h1>
+ 
+
+      
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2023/05/18/c++%E6%A6%82%E8%BF%B0/" class="article-date">
+  <time datetime="2023-05-17T16:00:00.000Z" itemprop="datePublished">2023-05-18</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/C/">C++</a>
+  </div>
+  
+<div class="word_count">
+    <span class="post-time">
+        <span class="post-meta-item-icon">
+            <i class="ri-quill-pen-line"></i>
+            <span class="post-meta-item-text"> Word count:</span>
+            <span class="post-count">2.3k</span>
+        </span>
+    </span>
+
+    <span class="post-time">
+        &nbsp; | &nbsp;
+        <span class="post-meta-item-icon">
+            <i class="ri-book-open-line"></i>
+            <span class="post-meta-item-text"> Reading time≈</span>
+            <span class="post-count">8 min</span>
+        </span>
+    </span>
+</div>
+ 
+    </div>
+      
+    <div class="tocbot"></div>
+
+
+
+
+  
+    <div class="article-entry" itemprop="articleBody">
+       
+  <h2 id="1-C-基础"><a href="#1-C-基础" class="headerlink" title="1. C++基础"></a>1. C++基础</h2><h4 id="1-1-命名空间"><a href="#1-1-命名空间" class="headerlink" title="1.1 命名空间"></a>1.1 命名空间</h4><blockquote>
+<p>命名空间的目的是<strong>对标识符的名称进行本地化</strong>，以<strong>避免命名冲突或名字污染</strong>，c++提供了namespace关键字设置命名空间</p>
+</blockquote>
+<p>namespace的使用：</p>
+<ul>
+<li>定义方式：namespace + 空间名 + {}</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">namespace</span> myspace &#123; <span class="comment">/* Your Code*/</span> &#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>命名空间可以嵌套</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">namespace</span> myspace1&#123;</span><br><span class="line">    <span class="keyword">namespace</span> myspace2&#123;&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>命名空间内成员的使用 <strong>( 3种方式 )</strong></li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">namespace</span> myspace&#123;</span><br><span class="line">    <span class="type">int</span> a;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">f</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol>
+<li><h6 id="空间名称-作用域限定符-：："><a href="#空间名称-作用域限定符-：：" class="headerlink" title="空间名称 + 作用域限定符 ：："></a>空间名称 + 作用域限定符 ：：</h6></li>
+</ol>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">printf</span>(<span class="string">&quot;%d&quot;</span>,myspace::a);   myspace::<span class="built_in">f</span>(); </span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li><h6 id="using-空间名-：：成员名"><a href="#using-空间名-：：成员名" class="headerlink" title="using  空间名 ：：成员名"></a>using  空间名 ：：成员名</h6></li>
+</ol>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> myspace::a;</span><br><span class="line"><span class="function"><span class="keyword">using</span> <span class="title">myspace::f</span><span class="params">()</span></span>;</span><br></pre></td></tr></table></figure>
+
+<ol start="3">
+<li><h6 id="using-空间名-释放空间内的所有成员，一般不建议"><a href="#using-空间名-释放空间内的所有成员，一般不建议" class="headerlink" title="using 空间名 (释放空间内的所有成员，一般不建议)"></a>using 空间名 (释放空间内的所有成员，一般不建议)</h6></li>
+</ol>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> myspace;</span><br></pre></td></tr></table></figure>
+
+<h4 id="1-2-缺省参数"><a href="#1-2-缺省参数" class="headerlink" title="1.2 缺省参数"></a>1.2 缺省参数</h4><blockquote>
+<p>缺省参数（c编译器不支持）是<strong>声明或定义函数时</strong>为函数的<strong>参数指定一个缺省值</strong>。在调用该函数时，如果没有指定实参则采用</p>
+<p>该形参的<strong>缺省值</strong>，否则使用指定的实参</p>
+</blockquote>
+<ul>
+<li>缺省参数必须从右往左依次给出，且必须连续</li>
+<li>缺省参数不能在函数声明和定义中同时出现，会导致编译器无法获取缺省值</li>
+<li>缺省值必须是常量和全局变量</li>
+</ul>
+<h4 id="1-3-函数重载"><a href="#1-3-函数重载" class="headerlink" title="1.3 函数重载"></a>1.3 函数重载</h4><blockquote>
+<p>函数重载指c++中<strong>同一作用域内</strong>数个功能类似但<strong>形参列表不同</strong>的<strong>同名函数</strong>，通常用于函数功能相同但参数不同的场景。</p>
+</blockquote>
+<p>构成函数重载的条件：</p>
+<ul>
+<li>形参个数不同</li>
+<li>形参类型不同</li>
+<li>形参顺序不同</li>
+</ul>
+<p><strong>函数重载的实现原理 – 名字修饰</strong></p>
+<p>c++编译器在编译后会对函数名字做修饰，以Linux下g++编译器为例，会以如下格式对函数名进行修饰：</p>
+<blockquote>
+<p>函数修饰名：  _Z + 函数长度 + 函数名 + 类型首字母</p>
+</blockquote>
+<p>如下图所示，参数加入到了函数修饰的规则中，因此当函数参数列表不同时，对应的修饰函数名也不用，所以在进行函数调用时，就能正确的找到函数的地址：</p>
+<p><img src="http://lemon-pi.oss-cn-beijing.aliyuncs.com/img/5.1.png"></p>
+<p>而使用c编译器，例如gcc时，函数名就是原函数名，所以只要函数名相同，不论函数形参列表是否相同，c编译器都会认为是同一个函数，这就导致调用时出错，不知道该调用哪个函数，因此c编译器不支持函数重载。gcc编译器函数名修饰如下图所示：</p>
+<p><img src="http://lemon-pi.oss-cn-beijing.aliyuncs.com/img/5.0.png"></p>
+<p><strong>extern “C” :</strong></p>
+<p>由于c&#x2F;c++编译器的修饰规则不同的原因，当出现c&#x2F;c++需要调用彼此库函数的时候，就会出现各种错误。</p>
+<p>在制作c语言静态库时，可以在函数前加上 extern”C” ,告诉c++编译器以c的修饰规则来修饰这些函数名的，进行链接时，链接器就会以c的修饰规则去找到函数地址。如下所示：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">pragma</span> once</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 如果是c++工程</span></span><br><span class="line"><span class="meta">#<span class="keyword">ifdef</span> __cplusplus</span></span><br><span class="line"><span class="keyword">extern</span> <span class="string">&quot;C&quot;</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line"> <span class="function"><span class="type">int</span> <span class="title">Add</span><span class="params">(<span class="type">int</span> left, <span class="type">int</span> right)</span></span>;</span><br><span class="line"> <span class="function"><span class="type">int</span> <span class="title">Sub</span><span class="params">(<span class="type">int</span> left, <span class="type">int</span> right)</span></span>;</span><br><span class="line"><span class="meta">#<span class="keyword">ifdef</span> __cplusplus</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br></pre></td></tr></table></figure>
+
+<h4 id="1-4-inline（内联函数）"><a href="#1-4-inline（内联函数）" class="headerlink" title="1.4 inline（内联函数）"></a>1.4 inline（内联函数）</h4><p>以inlin修饰的函数称为内联函数，c++编译器会在调用内联函数处直接展开代码，不会创建函数栈帧，以空间换时间的方式来提高运行效率。不同编译器对inline的实现机制可能存在差异，</p>
+<ul>
+<li>inline函数适用于规模较小、不涉及递归、频繁调用的函数，否则编译器会忽略inline属性</li>
+<li>inline函数不能进行声明和定义分离，链接时，由于调用处直接展开，没有函数地址，导致链接失败</li>
+</ul>
+<h2 id="2-类和对象"><a href="#2-类和对象" class="headerlink" title="2. 类和对象"></a>2. 类和对象</h2><h4 id="2-1-封装"><a href="#2-1-封装" class="headerlink" title="2.1 封装"></a>2.1 封装</h4><blockquote>
+<p><strong>封装：将数据和操作数据的方法进行有机结合，隐藏对象的属性和实现细节，仅对外公开接口来和对象进行</strong></p>
+<p><strong>交互。封装本质上是一种管理，让用户更方便使用类</strong></p>
+</blockquote>
+<h4 id="2-2-类的引入"><a href="#2-2-类的引入" class="headerlink" title="2.2 类的引入"></a>2.2 类的引入</h4><p>C语言中，struct结构体只能定义变量，不能定义函数。C++中，struct结构体变量和函数都能定义，这便是C++的类的特性。在C++中，有专门的<strong>class关键字</strong>来表示类，之所以struct也可以表示类，是C++为了更好的兼容C语言。当然，class和struct也有一点区别：</p>
+<ul>
+<li>class默认的访问权限是private，struct默认的访问权限是public</li>
+</ul>
+<h4 id="2-3-类的作用域"><a href="#2-3-类的作用域" class="headerlink" title="2.3 类的作用域"></a>2.3 类的作用域</h4><p>类定义了一个独立的作用域，类中的成员变量和成员函数作用于类的作用域中，在类外使用成员变量和成员函数时，需要使用作用于限定符<code>::</code>来指定属于哪个类域</p>
+<h4 id="2-4-类的定义"><a href="#2-4-类的定义" class="headerlink" title="2.4 类的定义"></a>2.4 类的定义</h4><p>以下是一个Person类的定义：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> std::cout;</span><br><span class="line"><span class="keyword">using</span> std::endl;</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Person</span>&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">show</span><span class="params">()</span></span>;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="type">char</span> *name_;</span><br><span class="line">    <span class="type">char</span> *gender_;</span><br><span class="line">    <span class="type">int</span> age_;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">Person::show</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	cout&lt;&lt;name_&lt;&lt;<span class="string">&quot; &quot;</span>&lt;&lt;gender_&lt;&lt;<span class="string">&quot; &quot;</span>&lt;&lt;age_</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在上述类中，定义了3个成员变量（name_,gender_,age_) ，声明了一个成员函数show，其中<code>public</code>  和  <code>private</code>是<strong>访问限定符</strong></p>
+<p>注意，上述Person类只在类体中声明了成员函数，是在类体外进行成员函数的定义，这也是推荐的一种做法，因为直接在类中定义成员函数，会被编译器处理成inline函数 </p>
+<h4 id="2-5-访问限定符"><a href="#2-5-访问限定符" class="headerlink" title="2.5 访问限定符"></a>2.5 访问限定符</h4><blockquote>
+<p>访问限定符的作用是将类内封装的成员和函数选择性的提供给类外使用，共设有三种访问权限：public、protected、private</p>
+</blockquote>
+<p><img src="http://lemon-pi.oss-cn-beijing.aliyuncs.com/img/5.2.png"></p>
+<ul>
+<li><strong>public</strong>属性的成员或函数可以在类外通过<strong>作用域限定符</strong>和对象进行访问，而protected属性和private属性无法在类外直接访问</li>
+<li>·访问限定符的作用范围是从定义处直到下一个访问限定符</li>
+<li>class默认访问限定符是private，struct默认访问限定符是public(为了更好的兼容C语言)</li>
+<li>访问限定符只对编译器有效，内存上不同属性的成员是没有区别的</li>
+</ul>
+<h4 id="2-6-对象"><a href="#2-6-对象" class="headerlink" title="2.6 对象"></a>2.6 对象</h4><blockquote>
+<p>作用域+属性+方法构成了类，类是事物描述的集合，没有事物的实体。对象是类的实例化，它是实体，有实际的物理空间去存放类中描述的属性和方法。说人话就是，类是图纸，对象是根据图纸造出来的实体建筑</p>
+</blockquote>
+<p><strong>对象的存储方式：</strong></p>
+<p>每个对象只保存成员变量,成员函数放在公共代码区，减少空间浪费.</p>
+<p><img src="http://lemon-pi.oss-cn-beijing.aliyuncs.com/img/5.3.png"></p>
+<h4 id="2-7-结构体对齐"><a href="#2-7-结构体对齐" class="headerlink" title="2.7 结构体对齐"></a>2.7 结构体对齐</h4><p>结构体对齐是编译器在类实例化对象时为对象分配内存空间大小的一种规则，采用这种规则是为了<strong>方便C++编译器进行内存的分配和回收</strong></p>
+<p>以VC编译器的内存分配为例：</p>
+<p><img src="http://lemon-pi.oss-cn-beijing.aliyuncs.com/img/5.4.png"></p>
+<p>上图分别表示了Complex对象和String对象分别在Debug（左）和release（右）模式下占用内存空间的大小。</p>
+<p>以Debug模式下的Complex对象为例:</p>
+<ul>
+<li><p>内存空间上下有一对cookie，除了第一位其他位用来表示这段内存空间大小，第一位是标记位，0标识这段内存空间未使用，1标识已使用，共占8字节，</p>
+</li>
+<li><p>红色箭头所指的两处是编译器Debug模式下固定带的36字节数据</p>
+</li>
+<li><p>黄色部分就是对象的大小</p>
+</li>
+<li><p>pad部分是对齐所占空间，目的是保证内存空间分配是16的倍数，这样初始时cookie的第一位就一定是0，这样就可以用来标记内存空间的状态了</p>
+</li>
+</ul>
+<p><img src="http://lemon-pi.oss-cn-beijing.aliyuncs.com/img/5.6.png"></p>
+<p>结构体对齐的规则：</p>
+<p>默认对齐数：编译器设置的默认参数，不同编译器对应的对齐数可能不一样</p>
+<p>实际对齐数：min（默认对齐数，该成员大小） （实际对齐数是动态调整的）</p>
+<p>成员起始地址偏移量为0，随后成员的地址偏移量+1是实际对齐数的倍数</p>
+<p>结构体总大小：最大对齐数（默认对齐数和所有实际对齐数的最大值）的整数倍</p>
+<h4 id="2-8-this指针"><a href="#2-8-this指针" class="headerlink" title="2.8 this指针"></a>2.8 this指针</h4><blockquote>
+<p>C++强制将普通类成员函数的第一个参数设置成了默认的this指针(const,不可修改)，该指针指向了类实例化出来的某个对象，通过this指针就可以对对象中的成员进行一个</p>
+</blockquote>
+<ul>
+<li>this指针是成员函数的<strong>隐含</strong>的第一个形参，由编译器通过ecx寄存器传递参数值</li>
+<li>对象调用成员函数时，会将将对象地址作为实参传递给this指针，就可以通过this指针访问对象的成员变量</li>
+</ul>
+<p><strong>为什么需要this指针？</strong></p>
+<p>因为C++的对象存储方式，对象内部只存了成员变量，成员函数是放在了公共代码区，所以成员函数没法直接访问对象内的成员变量，因此C++为成员函数设置了一个默认this指针形参，通过this指针去访问成员变量，而将this指针设为强制的隐含形参，也是避免程序员自己去设置</p>
+<h2 id="3-继承和多态"><a href="#3-继承和多态" class="headerlink" title="3. 继承和多态"></a>3. 继承和多态</h2> 
+      <!-- reward -->
+      
+      <div id="reword-out">
+        <div id="reward-btn">
+          Donate
+        </div>
+      </div>
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <div class="declare">
+      <ul class="post-copyright">
+        <li>
+          <i class="ri-copyright-line"></i>
+          <strong>Copyright： </strong>
+          
+          Copyright is owned by the author. For commercial reprints, please contact the author for authorization. For non-commercial reprints, please indicate the source.
+          
+        </li>
+      </ul>
+    </div>
+    
+    <footer class="article-footer">
+       
+<div class="share-btn">
+      <span class="share-sns share-outer">
+        <i class="ri-share-forward-line"></i>
+        分享
+      </span>
+      <div class="share-wrap">
+        <i class="arrow"></i>
+        <div class="share-icons">
+          
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="ri-weibo-fill"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="ri-wechat-fill"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="ri-qq-fill"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="ri-douban-line"></i>
+          </a>
+          <!-- <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a> -->
+          
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="ri-facebook-circle-fill"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="ri-twitter-fill"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="ri-google-fill"></i>
+          </a>
+        </div>
+      </div>
+</div>
+
+<div class="wx-share-modal">
+    <a class="modal-close" href="javascript:;"><i class="ri-close-circle-line"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//api.qrserver.com/v1/create-qr-code/?size=150x150&data=http://example.com/2023/05/18/c++%E6%A6%82%E8%BF%B0/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div id="share-mask"></div>  
+    </footer>
+  </div>
+
+   
+  <nav class="article-nav">
+    
+    
+      <a href="/2023/05/12/Socket%E7%BC%96%E7%A8%8B/" class="article-nav-link">
+        <strong class="article-nav-caption">下一篇</strong>
+        <div class="article-nav-title">Tcp/Udp协议及Linux下Socket编程</div>
+      </a>
+    
+  </nav>
+
+  
+   
+  
+   
+    <script src="https://cdn.staticfile.org/twikoo/1.4.18/twikoo.all.min.js"></script>
+    <div id="twikoo" class="twikoo"></div>
+    <script>
+        twikoo.init({
+            envId: ""
+        })
+    </script>
+ 
+</article>
+
+</section>
+      <footer class="footer">
+  <div class="outer">
+    <ul>
+      <li>
+        Copyrights &copy;
+        2023
+        <i class="ri-heart-fill heart_icon"></i> Yun Jia
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+        
+        <span>
+  <span><i class="ri-user-3-fill"></i>Visitors:<span id="busuanzi_value_site_uv"></span></span>
+  <span class="division">|</span>
+  <span><i class="ri-eye-fill"></i>Views:<span id="busuanzi_value_page_pv"></span></span>
+</span>
+        
+      </li>
+    </ul>
+    <ul>
+      
+        <li>
+          <a href="https://beian.miit.gov.cn/" target="_black" rel="nofollow">鄂ICP备2023006869号-1</a>
+        </li>
+        
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      <li>
+        <!-- cnzz统计 -->
+        
+        <script type="text/javascript" src='https://s9.cnzz.com/z_stat.php?id=1278069914&amp;web_id=1278069914'></script>
+        
+      </li>
+    </ul>
+  </div>
+</footer>    
+    </main>
+    <div class="float_btns">
+      <div class="totop" id="totop">
+  <i class="ri-arrow-up-line"></i>
+</div>
+
+<div class="todark" id="todark">
+  <i class="ri-moon-line"></i>
+</div>
+
+    </div>
+    <aside class="sidebar on">
+      <button class="navbar-toggle"></button>
+<nav class="navbar">
+  
+  <div class="logo">
+    <a href="/"><img src="/images/ayer.svg" alt="嘉禾望岗"></a>
+  </div>
+  
+  <ul class="nav nav-main">
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/">主页</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/archives">归档</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/categories">分类</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/tags">标签</a>
+    </li>
+    
+  </ul>
+</nav>
+<nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      
+      <a class="nav-item-link nav-item-search"  title="Search">
+        <i class="ri-search-line"></i>
+      </a>
+      
+      
+      <a class="nav-item-link" target="_blank" href="/atom.xml" title="RSS Feed">
+        <i class="ri-rss-line"></i>
+      </a>
+      
+    </li>
+  </ul>
+</nav>
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+    </aside>
+    <div id="mask"></div>
+
+<!-- #reward -->
+<div id="reward">
+  <span class="close"><i class="ri-close-line"></i></span>
+  <p class="reward-p"><i class="ri-cup-line"></i>请我喝杯咖啡吧~</p>
+  <div class="reward-box">
+    
+    <div class="reward-item">
+      <img class="reward-img" src="/images/wechat%20(2).jpg">
+      <span class="reward-type">支付宝</span>
+    </div>
+    
+    
+    <div class="reward-item">
+      <img class="reward-img" src="/images/wechat.jpg">
+      <span class="reward-type">微信</span>
+    </div>
+    
+  </div>
+</div>
+    
+<script src="/js/jquery-3.6.0.min.js"></script>
+ 
+<script src="/js/lazyload.min.js"></script>
+
+<!-- Tocbot -->
+ 
+<script src="/js/tocbot.min.js"></script>
+
+<script>
+  tocbot.init({
+    tocSelector: ".tocbot",
+    contentSelector: ".article-entry",
+    headingSelector: "h1, h2, h3, h4, h5, h6",
+    hasInnerContainers: true,
+    scrollSmooth: true,
+    scrollContainer: "main",
+    positionFixedSelector: ".tocbot",
+    positionFixedClass: "is-position-fixed",
+    fixedSidebarOffset: "auto",
+  });
+</script>
+
+<script src="https://cdn.staticfile.org/jquery-modal/0.9.2/jquery.modal.min.js"></script>
+<link
+  rel="stylesheet"
+  href="https://cdn.staticfile.org/jquery-modal/0.9.2/jquery.modal.min.css"
+/>
+<script src="https://cdn.staticfile.org/justifiedGallery/3.8.1/js/jquery.justifiedGallery.min.js"></script>
+
+<script src="/dist/main.js"></script>
+
+<!-- ImageViewer -->
+ <!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <!-- Background of PhotoSwipe. 
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+
+        <!-- Container that holds slides. 
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                <!--  Controls are self-explanatory. Order can be changed. -->
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" style="display:none" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<link rel="stylesheet" href="https://cdn.staticfile.org/photoswipe/4.1.3/photoswipe.min.css">
+<link rel="stylesheet" href="https://cdn.staticfile.org/photoswipe/4.1.3/default-skin/default-skin.min.css">
+<script src="https://cdn.staticfile.org/photoswipe/4.1.3/photoswipe.min.js"></script>
+<script src="https://cdn.staticfile.org/photoswipe/4.1.3/photoswipe-ui-default.min.js"></script>
+
+<script>
+    function viewer_init() {
+        let pswpElement = document.querySelectorAll('.pswp')[0];
+        let $imgArr = document.querySelectorAll(('.article-entry img:not(.reward-img)'))
+
+        $imgArr.forEach(($em, i) => {
+            $em.onclick = () => {
+                // slider展开状态
+                // todo: 这样不好，后面改成状态
+                if (document.querySelector('.left-col.show')) return
+                let items = []
+                $imgArr.forEach(($em2, i2) => {
+                    let img = $em2.getAttribute('data-idx', i2)
+                    let src = $em2.getAttribute('data-target') || $em2.getAttribute('src')
+                    let title = $em2.getAttribute('alt')
+                    // 获得原图尺寸
+                    const image = new Image()
+                    image.src = src
+                    items.push({
+                        src: src,
+                        w: image.width || $em2.width,
+                        h: image.height || $em2.height,
+                        title: title
+                    })
+                })
+                var gallery = new PhotoSwipe(pswpElement, PhotoSwipeUI_Default, items, {
+                    index: parseInt(i)
+                });
+                gallery.init()
+            }
+        })
+    }
+    viewer_init()
+</script> 
+<!-- MathJax -->
+
+<!-- Katex -->
+
+<!-- busuanzi  -->
+ 
+<script src="/js/busuanzi-2.3.pure.min.js"></script>
+ 
+<!-- ClickLove -->
+
+<!-- ClickBoom1 -->
+
+<!-- ClickBoom2 -->
+
+<!-- CodeCopy -->
+
+<!-- CanvasBackground -->
+
+<script>
+  if (window.mermaid) {
+    mermaid.initialize({ theme: "forest" });
+  }
+</script>
+
+
+    
+    <div id="music">
+    
+    
+    
+    <iframe frameborder="no" border="1" marginwidth="0" marginheight="0" width="200" height="86"
+        src="//music.163.com/outchain/player?type=2&id=2027529783&auto=1&height=66"></iframe>
+</div>
+
+<style>
+    #music {
+        position: fixed;
+        right: 15px;
+        bottom: 0;
+        z-index: 998;
+    }
+</style>
+    
+    
+
+  </div>
+</body>
+
+</html>

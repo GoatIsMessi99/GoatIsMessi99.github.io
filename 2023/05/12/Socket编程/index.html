@@ -287,7 +287,7 @@
 
 <p>以下是运行截图：</p>
 <p><img src="http://lemon-pi.oss-cn-beijing.aliyuncs.com/img/4.9.png"></p>
-<h4 id="3-2-TcpSocket"><a href="#3-2-TcpSocket" class="headerlink" title="3.2 TcpSocket"></a>3.2 TcpSocket</h4><p>Tcp提供面向连接的可靠的服务，因此进行通信前需要先建立连接</p>
+<h3 id="3-2-TcpSocket"><a href="#3-2-TcpSocket" class="headerlink" title="3.2 TcpSocket"></a>3.2 TcpSocket</h3><p>Tcp提供面向连接的可靠的服务，因此进行通信前需要先建立连接</p>
 <p>对于服务端 ：socket（创建套接字）  -&gt;  bind （和进程关联）-&gt;  listen(监听)  -&gt;  accept (建立连接)  -&gt;  read&#x2F;write (通信) </p>
 <p>对于客户端： socket（创建套接字）  -&gt;  bind （和进程关联）-&gt;  connect(连接请求)   -&gt;  read&#x2F;write (通信) </p>
 <h4 id="3-2-1-listen"><a href="#3-2-1-listen" class="headerlink" title="3.2.1 listen"></a>3.2.1 listen</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">listen</span><span class="params">(<span class="type">int</span> s, <span class="type">int</span> backlog)</span>;</span><br></pre></td></tr></table></figure>
@@ -415,6 +415,15 @@
 
    
   <nav class="article-nav">
+    
+      <a href="/2023/05/18/c++%E6%A6%82%E8%BF%B0/" class="article-nav-link">
+        <strong class="article-nav-caption">上一篇</strong>
+        <div class="article-nav-title">
+          
+            C++三大特性（封装、继承、多态）
+          
+        </div>
+      </a>
     
     
       <a href="/2023/04/29/%E8%BF%9B%E7%A8%8B/" class="article-nav-link">
