@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
+    <loc>http://example.com/2023/05/24/Modern%20Effective%20C++%20-%20lambda/</loc>
+    <lastmod>2023-09-27</lastmod>
+  </url>
+  <url>
     <loc>http://example.com/2023/05/22/Modern%20Effective%20C++%20-%20%E6%A8%A1%E6%9D%BF%E6%8E%A8%E5%AF%BC/</loc>
     <lastmod>2023-09-26</lastmod>
   </url>

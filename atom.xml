@@ -6,7 +6,7 @@
   <link href="http://example.com/atom.xml" rel="self"/>
   
   <link href="http://example.com/"/>
-  <updated>2023-09-26T14:27:54.271Z</updated>
+  <updated>2023-09-27T08:45:48.113Z</updated>
   <id>http://example.com/</id>
   
   <author>
@@ -15,6 +15,28 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>lambda表达式</title>
+    <link href="http://example.com/2023/05/24/Modern%20Effective%20C++%20-%20lambda/"/>
+    <id>http://example.com/2023/05/24/Modern%20Effective%20C++%20-%20lambda/</id>
+    <published>2023-05-23T16:00:00.000Z</published>
+    <updated>2023-09-27T08:45:48.113Z</updated>
+    
+    <content type="html"><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="\assets\css\APlayer.min.css"><script src="\assets\js\APlayer.min.js" class="aplayer-secondary-script-marker"></script><h2 id="1-lambda的特性与用法"><a href="#1-lambda的特性与用法" class="headerlink" title="1. lambda的特性与用法"></a>1. lambda的特性与用法</h2><h4 id="1-1-lambda与普通函数的区别"><a href="#1-1-lambda与普通函数的区别" class="headerlink" title="1.1 lambda与普通函数的区别"></a>1.1 lambda与普通函数的区别</h4><p>首先我们来看下基本lambda函数的构成：</p><p><code>[ ]( ) -&gt; void &#123; &#125;;</code></p><p>再来看看普通函数的构成:</p><p><code>void func( )&#123; &#125; 或 auto func( ) -&gt; void&#123; &#125;</code></p><p>通过对比，我们可以发现，lambda表达式与普通函数有如下异同：</p><p><strong>相同点：</strong></p><ul><li>函数形参列表</li><li>函数体</li></ul><p><strong>不同点：</strong></p><ul><li>lambda多了 [ ] 部分，我们称之为捕获列表</li><li>lambda没有显示的函数名</li></ul><h4 id="1-2-lambda捕获列表"><a href="#1-2-lambda捕获列表" class="headerlink" title="1.2 lambda捕获列表"></a>1.2 lambda捕获列表</h4><p>所谓捕获列表，可以理解为是函数形参列表的一部分，因为函数体内部是无法直接使用函数体外部的变量的，因此lambda表达式也成为<strong>闭包</strong> , 通过捕获列表获得的变量，可以被函数体内部使用。</p><p>lambda捕获列表形式有以下5种：</p><ul><li>空捕获 [ ]  ,  </li><li>值捕获 [param]</li><li>引用捕获[&amp;param]</li><li>隐式捕获 [&amp;] [&#x3D;] </li><li>表达式捕获 [ exp]</li></ul><p>捕获列表与普通函数的形参列表不同的一点是：<strong>lambda表达式在创建的时候，就对函数参数进行了初始化，而不是调用函数时才初始化</strong></p><p>（1) 值捕获</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> val = <span class="number">1</span>;</span><br><span class="line"><span class="keyword">auto</span> object = [val]() &#123;</span><br><span class="line">    <span class="keyword">return</span> val;</span><br><span class="line">&#125;;</span><br><span class="line">val = <span class="number">100</span>;</span><br><span class="line">cout&lt;&lt;<span class="built_in">object</span>()&lt;&lt;endl; <span class="comment">// 打印值为1，在lambda创建时，就对val进行了值拷贝</span></span><br></pre></td></tr></table></figure><p>(2) 引用捕获</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> val = <span class="number">1</span>;</span><br><span class="line"><span class="keyword">auto</span> object = [&amp;val]() &#123;</span><br><span class="line">    <span class="keyword">return</span> val;</span><br><span class="line">&#125;;</span><br><span class="line">val = <span class="number">100</span>;</span><br><span class="line">cout&lt;&lt;<span class="built_in">object</span>()&lt;&lt;endl; <span class="comment">// 打印值为100,val为引用，修改时val也会变化</span></span><br></pre></td></tr></table></figure><p>(3) 隐式捕获</p><p>为了避免程序员自己手动去捕获变量，lambda提供了[&amp;]  [&#x3D;] 写法，编译器会自动推导需要捕获的变量</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> val = <span class="number">1</span>;</span><br><span class="line"><span class="keyword">auto</span> object = [&amp;]() &#123;</span><br><span class="line">    <span class="keyword">return</span> val;</span><br><span class="line">&#125;;</span><br><span class="line">val = <span class="number">100</span>;</span><br><span class="line">cout&lt;&lt;<span class="built_in">object</span>()&lt;&lt;endl; </span><br></pre></td></tr></table></figure><h4 id="1-2-lambda的使用场景"><a href="#1-2-lambda的使用场景" class="headerlink" title="1.2 lambda的使用场景"></a>1.2 lambda的使用场景</h4><p>那么在C++11中，引入lambda的目的是什么呢？我认为主要是服务于以下场景：<strong>只需要实现一个简单的函数功能，而且只有该处需要调用这个函数，后续不需要再调用这个函数</strong>  </p><p>例如以下场景：</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 1. 我们需要使用sort对自定义类数据进行排序，因此我们需要自定义排序函数，而这个自定义排序函数在后续代码中都不需要再重复调用，因此我们直接在该处，使用lambda表达式即可</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">A</span> &#123;</span><br><span class="line">    <span class="keyword">public</span>:</span><br><span class="line">      <span class="type">int</span> a_;  </span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    vector&lt;A&gt; v;</span><br><span class="line">    <span class="comment">// 将lambda表达式传到sort函数中</span></span><br><span class="line">    <span class="built_in">sort</span>(v.<span class="built_in">begin</span>(), v.<span class="built_in">end</span>(), [](A &amp;lhs, A &amp;rhs) &#123;</span><br><span class="line">    <span class="keyword">return</span> lhs.a_ &lt; rhs.a_;  </span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;link rel=&quot;stylesheet&quot; class=&quot;aplayer-secondary-style-marker&quot; href=&quot;&#92;assets&#92;css&#92;APlayer.min.css&quot;&gt;&lt;script src=&quot;&#92;assets&#92;js&#92;APlayer.min.js&quot; cla</summary>
+      
+    
+    
+    
+    <category term="Modern Effective C++" scheme="http://example.com/categories/Modern-Effective-C/"/>
+    
+    
+  </entry>
   
   <entry>
     <title>C++类型推导规则</title>
